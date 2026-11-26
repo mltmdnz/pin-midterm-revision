@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIN Mid-Term 2 Revision — Practice Exam A</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .exam-navy { background-color: #1e3a5f; }
+        .exam-navy-text { color: #1e3a5f; }
+        .exam-navy-border { border-color: #1e3a5f; }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-100 selection:text-blue-900">
+    <!-- STUDENT ENTRY MODAL -->
+    <div id="loginOverlay" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-6 my-auto">
+            <div class="text-center space-y-1.5">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl exam-navy text-white font-bold text-lg shadow-sm mb-1">
+                    PIN
+                </div>
+                <h2 class="text-xl font-bold text-slate-900">PIN Mid-Term 2 Revision</h2>
+                <p class="text-xs text-slate-500">Practice Exam A • Online Practice Exam</p>
+            </div>
+
+            <form id="studentLoginForm" onsubmit="handleStudentLogin(event)" class="space-y-4">
+                <div>
+                    <label for="sessionCodeInput" class="block text-xs font-semibold text-slate-700 mb-1.5">
+                        Session Code
+                    </label>
+                    <input type="text" id="sessionCodeInput" required maxlength="32" autocomplete="off"
+                        value="PIN-MT2-A" placeholder="PIN-MT2-A"
+                        class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm font-mono uppercase focus:outline-none focus:ring-2 focus:ring-blue-900/30 focus:border-blue-900 bg-slate-50">
+                </div>
+
+                <div>
+                    <label for="studentNameInput" class="block text-xs font-semibold text-slate-700 mb-1.5">
+                        Name
+                    </label>
+                    <input type="text" id="studentNameInput" required maxlength="48" autocomplete="off"
+                        placeholder="Enter your name"
+                        class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-900/30 focus:border-blue-900">
+                </div>
+
+                <div id="studentLoginError" class="hidden text-xs text-rose-700 bg-rose-50 border border-rose-200 p-2.5 rounded-lg"></div>
+
+                <button type="submit" id="studentLoginBtn" class="w-full exam-navy hover:opacity-95 text-white font-semibold text-sm py-2.5 rounded-xl transition shadow-sm">
+                    Start Exam
+                </button>
+            </form>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                <span class="flex items-center gap-1.5">
+                    <span id="dbStatusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span id="dbStatusText">Connecting...</span>
+                </span>
+                <div class="flex items-center gap-3">
+                    <span class="font-mono text-[10px] text-slate-400">68 Questions • 60 Mins</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- TOP NAV HEADER -->
+    <header class="exam-navy text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h1 class="text-sm sm:text-base font-bold tracking-tight text-white">
+                    PIN Mid-Term 2 Revision — Practice Exam A
+                </h1>
+                <p class="text-[11px] sm:text-xs text-blue-200">
+                    Pre-Intermediate (Units 5, 6 &amp; 7) • Online Practice Exam
+                </p>
+            </div>
+            
+            <div class="flex items-center space-x-3 sm:space-x-4">
+                <!-- Student Session Badge -->
+                <div id="sessionBadge" class="hidden items-center space-x-1.5 bg-blue-950/70 px-2.5 py-1.5 rounded-lg border border-blue-400/30 text-[11px]">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="sessionBadgeLabel" class="font-mono font-semibold text-blue-100"></span>
+                </div>
+
+                <!-- Countdown Timer -->
+                <div id="timerContainer" class="flex items-center space-x-2 bg-slate-900/50 px-3 py-1.5 rounded-lg border border-slate-600 text-xs sm:text-sm">
+                    <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+                        <polyline points="12 6 12 12 16 14" stroke-width="2" stroke-linecap="round"></polyline>
+                    </svg>
+                    <span class="text-slate-300 hidden md:inline">Time Left:</span>
+                    <span id="timerDisplay" class="font-mono font-bold text-amber-300">60:00</span>
+                </div>
+
+                <!-- Submit Header Button -->
+                <button id="headerSubmitBtn" onclick="confirmSubmission()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold px-4 py-1.5 rounded-lg transition shadow-sm flex items-center space-x-1.5">
+                    <span>Submit All &amp; Finish</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER WITH SIDEBAR -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full flex flex-col lg:flex-row gap-6">
+
+        <!-- CONTENT AREA (LEFT / CENTER) -->
+        <main class="flex-1 min-w-0 flex flex-col space-y-6">
+
+            <!-- ATTEMPT REVIEW SUMMARY BANNER (Shown post-submit) -->
+            <div id="reviewBanner" class="hidden bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center border-b border-slate-100 pb-4 gap-3">
+                    <div>
+                        <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 mb-1">Attempt Completed</span>
+                        <h2 class="text-xl font-bold text-slate-900">Practice Exam Results Summary</h2>
+                    </div>
+                    <button onclick="resetExam()" class="self-start sm:self-auto exam-navy hover:opacity-90 text-white text-xs font-semibold px-4 py-2 rounded-lg transition flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        <span>Retake Practice Exam</span>
+                    </button>
+                </div>
+
+                <!-- Score Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <div class="bg-blue-50/70 border border-blue-200 p-3 rounded-lg text-center">
+                        <div class="text-xs font-bold exam-navy-text uppercase">Total Score</div>
+                        <div id="totalScoreVal" class="text-2xl font-extrabold exam-navy-text mt-1">0 / 100</div>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 p-3 rounded-lg text-center">
+                        <div class="text-xs font-medium text-slate-500 uppercase">Reading</div>
+                        <div id="readingScoreVal" class="text-lg font-bold text-slate-800 mt-1">0 / 20</div>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 p-3 rounded-lg text-center">
+                        <div class="text-xs font-medium text-slate-500 uppercase">Grammar</div>
+                        <div id="grammarScoreVal" class="text-lg font-bold text-slate-800 mt-1">0 / 45</div>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 p-3 rounded-lg text-center">
+                        <div class="text-xs font-medium text-slate-500 uppercase">Vocabulary</div>
+                        <div id="vocabScoreVal" class="text-lg font-bold text-slate-800 mt-1">0 / 25</div>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 p-3 rounded-lg text-center col-span-2 sm:col-span-1">
+                        <div class="text-xs font-medium text-slate-500 uppercase">Social Eng.</div>
+                        <div id="socialScoreVal" class="text-lg font-bold text-slate-800 mt-1">0 / 10</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE SECTION NAV TABS HEADER (4 PAGES) -->
+            <div class="bg-white rounded-xl border border-slate-200 p-2 shadow-sm flex items-center justify-between overflow-x-auto custom-scrollbar">
+                <div class="flex space-x-1.5 min-w-max w-full">
+                    <button onclick="switchPage(1)" id="tab-1" class="flex-1 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2">
+                        <span>Page 1: A. Reading</span>
+                        <span class="bg-black/10 px-1.5 py-0.5 rounded text-[10px]">20 pts</span>
+                    </button>
+                    <button onclick="switchPage(2)" id="tab-2" class="flex-1 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2">
+                        <span>Page 2: B. Grammar</span>
+                        <span class="bg-black/10 px-1.5 py-0.5 rounded text-[10px]">45 pts</span>
+                    </button>
+                    <button onclick="switchPage(3)" id="tab-3" class="flex-1 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2">
+                        <span>Page 3: C. Vocabulary</span>
+                        <span class="bg-black/10 px-1.5 py-0.5 rounded text-[10px]">25 pts</span>
+                    </button>
+                    <button onclick="switchPage(4)" id="tab-4" class="flex-1 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2">
+                        <span>Page 4: D. Social English</span>
+                        <span class="bg-black/10 px-1.5 py-0.5 rounded text-[10px]">10 pts</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ================= PAGE 1: READING SECTION ================= -->
+            <div id="page-1" class="page-content space-y-4">
+                <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm border-l-4 exam-navy-border flex flex-wrap justify-between items-center gap-2">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900">A. READING SECTION</h2>
+                        <p class="text-xs text-slate-500">Total: 20 Points (Part 1: 10 pts | Part 2: 10 pts)</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <!-- Mobile Toggle Button for Passage -->
+                        <button onclick="toggleMobileReading()" class="lg:hidden bg-blue-50 text-blue-900 border border-blue-200 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                            <span id="mobileToggleText">Show Reading Text</span>
+                        </button>
+                        <span class="bg-slate-100 text-slate-700 text-xs font-medium px-2.5 py-1 rounded-full border border-slate-200">Page 1 of 4</span>
+                    </div>
+                </div>
+
+                <!-- SPLIT-PANE LAYOUT ON DESKTOP -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+                    <!-- LEFT COLUMN: INDEPENDENTLY SCROLLABLE QUESTIONS (1-10) -->
+                    <div class="lg:col-span-7 lg:max-h-[calc(100vh-220px)] lg:overflow-y-auto custom-scrollbar pr-0 lg:pr-2 space-y-6">
+                        
+                        <!-- PART 1: MULTIPLE CHOICE (3 OPTIONS: a, b, c) -->
+                        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-5">
+                            <div class="border-b border-slate-100 pb-3">
+                                <h3 class="font-bold text-slate-900 text-sm">Part 1: Read the text on the right and choose the best option (a, b, or c) for each question.</h3>
+                                <p class="text-xs text-slate-500 mt-0.5">2 points each (10 points total)</p>
+                            </div>
+
+                            <!-- Q1 -->
+                            <div id="qcontainer-1" class="space-y-2 p-3.5 rounded-lg border border-slate-200 bg-slate-50/40">
+                                <p class="text-xs font-bold exam-navy-text uppercase">Question 1 <span class="font-normal lowercase text-slate-400">(2.00 pts)</span></p>
+                                <p class="text-sm font-medium text-slate-800">Why did Leo feel slightly embarrassed on his first morning at work?</p>
+                                <div class="space-y-1.5 pt-1">
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q1" value="a" onchange="markAnswered(1)" class="mt-1">
+                                        <span>a. He arrived twenty minutes late for his meeting.</span>
+                                    </label>
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q1" value="b" onchange="markAnswered(1)" class="mt-1">
+                                        <span>b. His clothes were much more formal than everyone else's.</span>
+                                    </label>
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q1" value="c" onchange="markAnswered(1)" class="mt-1">
+                                        <span>c. He forgot the name of his new manager.</span>
+                                    </label>
+                                </div>
+                                <div id="feedback-1" class="hidden text-xs mt-2 p-2 rounded"></div>
+                            </div>
+
+                            <!-- Q2 -->
+                            <div id="qcontainer-2" class="space-y-2 p-3.5 rounded-lg border border-slate-200 bg-slate-50/40">
+                                <p class="text-xs font-bold exam-navy-text uppercase">Question 2 <span class="font-normal lowercase text-slate-400">(2.00 pts)</span></p>
+                                <p class="text-sm font-medium text-slate-800">How did Leo feel by the end of his first week?</p>
+                                <div class="space-y-1.5 pt-1">
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q2" value="a" onchange="markAnswered(2)" class="mt-1">
+                                        <span>a. More comfortable because his colleagues were supportive.</span>
+                                    </label>
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q2" value="b" onchange="markAnswered(2)" class="mt-1">
+                                        <span>b. Still stressed about wearing the wrong clothes.</span>
+                                    </label>
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q2" value="c" onchange="markAnswered(2)" class="mt-1">
+                                        <span>c. Disappointed because the job was too difficult.</span>
+                                    </label>
+                                </div>
+                                <div id="feedback-2" class="hidden text-xs mt-2 p-2 rounded"></div>
+                            </div>
+
+                            <!-- Q3 -->
+                            <div id="qcontainer-3" class="space-y-2 p-3.5 rounded-lg border border-slate-200 bg-slate-50/40">
+                                <p class="text-xs font-bold exam-navy-text uppercase">Question 3 <span class="font-normal lowercase text-slate-400">(2.00 pts)</span></p>
+                                <p class="text-sm font-medium text-slate-800">What was Hannah's biggest worry before teaching her first class in Tokyo?</p>
+                                <div class="space-y-1.5 pt-1">
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q3" value="a" onchange="markAnswered(3)" class="mt-1">
+                                        <span>a. That the classroom would be too crowded.</span>
+                                    </label>
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q3" value="b" onchange="markAnswered(3)" class="mt-1">
+                                        <span>b. That her students wouldn't speak any English.</span>
+                                    </label>
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q3" value="c" onchange="markAnswered(3)" class="mt-1">
+                                        <span>c. That she might forget what she planned to teach.</span>
+                                    </label>
+                                </div>
+                                <div id="feedback-3" class="hidden text-xs mt-2 p-2 rounded"></div>
+                            </div>
+
+                            <!-- Q4 -->
+                            <div id="qcontainer-4" class="space-y-2 p-3.5 rounded-lg border border-slate-200 bg-slate-50/40">
+                                <p class="text-xs font-bold exam-navy-text uppercase">Question 4 <span class="font-normal lowercase text-slate-400">(2.00 pts)</span></p>
+                                <p class="text-sm font-medium text-slate-800">Why did Sam almost leave his first orchestra rehearsal?</p>
+                                <div class="space-y-1.5 pt-1">
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q4" value="a" onchange="markAnswered(4)" class="mt-1">
+                                        <span>a. Because the other players were much better than him.</span>
+                                    </label>
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q4" value="b" onchange="markAnswered(4)" class="mt-1">
+                                        <span>b. Because he forgot to bring his violin with him.</span>
+                                    </label>
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q4" value="c" onchange="markAnswered(4)" class="mt-1">
+                                        <span>c. Because nobody talked to him during the break.</span>
+                                    </label>
+                                </div>
+                                <div id="feedback-4" class="hidden text-xs mt-2 p-2 rounded"></div>
+                            </div>
+
+                            <!-- Q5 -->
+                            <div id="qcontainer-5" class="space-y-2 p-3.5 rounded-lg border border-slate-200 bg-slate-50/40">
+                                <p class="text-xs font-bold exam-navy-text uppercase">Question 5 <span class="font-normal lowercase text-slate-400">(2.00 pts)</span></p>
+                                <p class="text-sm font-medium text-slate-800">Who helped Sam feel more confident about staying in the orchestra?</p>
+                                <div class="space-y-1.5 pt-1">
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q5" value="a" onchange="markAnswered(5)" class="mt-1">
+                                        <span>a. His music professor.</span>
+                                    </label>
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q5" value="b" onchange="markAnswered(5)" class="mt-1">
+                                        <span>b. Another musician in the group.</span>
+                                    </label>
+                                    <label class="flex items-start space-x-2.5 text-sm p-2 rounded bg-white border border-slate-200 hover:bg-blue-50/50 cursor-pointer">
+                                        <input type="radio" name="q5" value="c" onchange="markAnswered(5)" class="mt-1">
+                                        <span>c. A friend he knew since he was eight.</span>
+                                    </label>
+                                </div>
+                                <div id="feedback-5" class="hidden text-xs mt-2 p-2 rounded"></div>
+                            </div>
+                        </div>
+
+                        <!-- PART 2: WHO SAYS THESE? (3 RADIO BUTTONS: a. LEO, b. HANNAH, c. SAM) -->
+                        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                            <div class="border-b border-slate-100 pb-3">
+                                <h3 class="font-bold text-slate-900 text-sm">Part 2: Read the text again. Who says these? Choose LEO, HANNAH, or SAM.</h3>
+                                <p class="text-xs text-slate-500 mt-0.5">2 points each (10 points total)</p>
+                            </div>
+
+                            <!-- Q6 -->
+                            <div id="qcontainer-6" class="p-3.5 rounded-lg border border-slate-200 bg-slate-50/40 space-y-2">
+                                <p class="text-sm font-medium text-slate-800">6. "I felt much calmer after sharing a drink with my new coworkers."</p>
+                                <div class="flex flex-wrap gap-3 pt-1 text-sm">
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q6" value="a" onchange="markAnswered(6)"> <span>a. LEO</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q6" value="b" onchange="markAnswered(6)"> <span>b. HANNAH</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q6" value="c" onchange="markAnswered(6)"> <span>c. SAM</span>
+                                    </label>
+                                </div>
+                                <div id="feedback-6" class="hidden text-xs mt-1 p-2 rounded"></div>
+                            </div>
+
+                            <!-- Q7 -->
+                            <div id="qcontainer-7" class="p-3.5 rounded-lg border border-slate-200 bg-slate-50/40 space-y-2">
+                                <p class="text-sm font-medium text-slate-800">7. "Someone offered to help me improve during our free time."</p>
+                                <div class="flex flex-wrap gap-3 pt-1 text-sm">
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q7" value="a" onchange="markAnswered(7)"> <span>a. LEO</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q7" value="b" onchange="markAnswered(7)"> <span>b. HANNAH</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q7" value="c" onchange="markAnswered(7)"> <span>c. SAM</span>
+                                    </label>
+                                </div>
+                                <div id="feedback-7" class="hidden text-xs mt-1 p-2 rounded"></div>
+                            </div>
+
+                            <!-- Q8 -->
+                            <div id="qcontainer-8" class="p-3.5 rounded-lg border border-slate-200 bg-slate-50/40 space-y-2">
+                                <p class="text-sm font-medium text-slate-800">8. "Using a fun activity helped the class feel more relaxed."</p>
+                                <div class="flex flex-wrap gap-3 pt-1 text-sm">
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q8" value="a" onchange="markAnswered(8)"> <span>a. LEO</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q8" value="b" onchange="markAnswered(8)"> <span>b. HANNAH</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q8" value="c" onchange="markAnswered(8)"> <span>c. SAM</span>
+                                    </label>
+                                </div>
+                                <div id="feedback-8" class="hidden text-xs mt-1 p-2 rounded"></div>
+                            </div>
+
+                            <!-- Q9 -->
+                            <div id="qcontainer-9" class="p-3.5 rounded-lg border border-slate-200 bg-slate-50/40 space-y-2">
+                                <p class="text-sm font-medium text-slate-800">9. "I got to the building earlier than necessary."</p>
+                                <div class="flex flex-wrap gap-3 pt-1 text-sm">
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q9" value="a" onchange="markAnswered(9)"> <span>a. LEO</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q9" value="b" onchange="markAnswered(9)"> <span>b. HANNAH</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q9" value="c" onchange="markAnswered(9)"> <span>c. SAM</span>
+                                    </label>
+                                </div>
+                                <div id="feedback-9" class="hidden text-xs mt-1 p-2 rounded"></div>
+                            </div>
+
+                            <!-- Q10 -->
+                            <div id="qcontainer-10" class="p-3.5 rounded-lg border border-slate-200 bg-slate-50/40 space-y-2">
+                                <p class="text-sm font-medium text-slate-800">10. "Living in a very busy city was difficult at first."</p>
+                                <div class="flex flex-wrap gap-3 pt-1 text-sm">
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q10" value="a" onchange="markAnswered(10)"> <span>a. LEO</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q10" value="b" onchange="markAnswered(10)"> <span>b. HANNAH</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded border border-slate-200 cursor-pointer hover:bg-blue-50/50">
+                                        <input type="radio" name="q10" value="c" onchange="markAnswered(10)"> <span>c. SAM</span>
+                                    </label>
+                                </div>
+                                <div id="feedback-10" class="hidden text-xs mt-1 p-2 rounded"></div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- RIGHT COLUMN: PINNED / STICKY READING TEXT -->
+                    <div id="readingPassageContainer" class="hidden lg:block lg:col-span-5 lg:sticky lg:top-20">
+                        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar border-t-4 exam-navy-border">
+                            <div class="border-b border-slate-100 pb-3 mb-4">
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Reading Text</span>
+                                <h3 class="text-base font-bold text-slate-900 leading-snug">First Day Nerves: Three People Share Their Stories</h3>
+                            </div>
+
+                            <div class="prose prose-slate prose-sm text-xs sm:text-[13px] leading-relaxed space-y-4">
+                                <div class="bg-blue-50/40 p-3.5 rounded-lg border border-blue-100">
+                                    <h4 class="font-bold exam-navy-text text-sm mb-1">Leo, 24 – Starting a First Office Job</h4>
+                                    <p class="text-slate-700">
+                                        "I remember my first day at a marketing agency in London last year. I was incredibly nervous because I didn't know anyone, and I was worried about making a good impression. To be safe, I decided to wear a smart suit and arrive twenty minutes early. However, when I walked into the office, everyone was wearing jeans and T-shirts! My manager laughed kindly and told me that the dress code was completely casual. At first, I felt a bit embarrassed, but after having coffee with the team, I started to relax. By the end of the week, I realized that everyone was friendly and always ready to help."
+                                    </p>
+                                </div>
+
+                                <div class="bg-emerald-50/40 p-3.5 rounded-lg border border-emerald-100">
+                                    <h4 class="font-bold text-emerald-900 text-sm mb-1">Hannah, 27 – Moving to a New Country to Teach</h4>
+                                    <p class="text-slate-700">
+                                        "Two years ago, I moved to Tokyo to teach English, even though I couldn't speak Japanese at all. Before my first class, my hands were shaking! I had to teach a group of twenty adult students, and I was afraid of forgetting my lesson plan. Instead of starting with grammar rules, I decided to play a simple speaking game so we could learn each other's names. The students loved it, and the atmosphere became much warmer immediately. Looking back, moving abroad was the best decision I've ever made, although living in such a crowded city took some time to get used to."
+                                    </p>
+                                </div>
+
+                                <div class="bg-amber-50/40 p-3.5 rounded-lg border border-amber-100">
+                                    <h4 class="font-bold text-amber-900 text-sm mb-1">Sam, 22 – Joining a University Orchestra</h4>
+                                    <p class="text-slate-700">
+                                        "I've played the violin since I was eight, so I thought joining the university orchestra would be easy. I was wrong! When I went to my first rehearsal in October, the other musicians were playing much faster and more confidently than me. During the break, I nearly decided to leave because I didn't feel good enough. Fortunately, the girl sitting next to me noticed I was stressed and offered to practice the difficult parts together after class. Thanks to her help, I didn't give up, and now playing in the orchestra is the happiest part of my week."
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ================= PAGE 2: GRAMMAR SECTION ================= -->
+            <div id="page-2" class="page-content hidden space-y-6">
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm border-l-4 exam-navy-border flex justify-between items-center">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900">B. GRAMMAR SECTION</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Total: 45 Points (6 Parts)</p>
+                    </div>
+                    <span class="bg-slate-100 text-slate-700 text-xs font-medium px-2.5 py-1 rounded-full border border-slate-200">Page 2 of 4</span>
+                </div>
+
+                <!-- PART 1: MULTIPLE CHOICE COMPARATIVES & QUANTIFIERS (9 PTS - 1.5 pts each) -->
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                    <div class="border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-900 text-sm">Part 1: Choose the best option (a, b, or c) to complete each sentence.</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">1.5 points each (9 points total)</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div id="qcontainer-11" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">11. Trains in Vienna arrive every two minutes and are never late, so public transport there is much ________ than in my hometown.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q11" value="a" onchange="markAnswered(11)"> a. more efficient</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q11" value="b" onchange="markAnswered(11)"> b. most efficient</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q11" value="c" onchange="markAnswered(11)"> c. as efficient</label>
+                            </div>
+                            <div id="feedback-11" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-12" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">12. August is usually ________ month of the year in Antalya, with temperatures over 40°C.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q12" value="a" onchange="markAnswered(12)"> a. hotter than</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q12" value="b" onchange="markAnswered(12)"> b. the hottest</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q12" value="c" onchange="markAnswered(12)"> c. the hotter</label>
+                            </div>
+                            <div id="feedback-12" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-13" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">13. My new apartment is smaller than my old one, so it isn't ________ for a family of five.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q13" value="a" onchange="markAnswered(13)"> a. big enough</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q13" value="b" onchange="markAnswered(13)"> b. enough big</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q13" value="c" onchange="markAnswered(13)"> c. too much big</label>
+                            </div>
+                            <div id="feedback-13" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-14" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">14. I couldn't sleep last night because I drank ________ coffee in the evening.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q14" value="a" onchange="markAnswered(14)"> a. too many</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q14" value="b" onchange="markAnswered(14)"> b. too</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q14" value="c" onchange="markAnswered(14)"> c. too much</label>
+                            </div>
+                            <div id="feedback-14" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-15" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">15. There were ________ people at the shopping mall on Saturday, so we decided to go home.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q15" value="a" onchange="markAnswered(15)"> a. too much</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q15" value="b" onchange="markAnswered(15)"> b. too many</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q15" value="c" onchange="markAnswered(15)"> c. enough</label>
+                            </div>
+                            <div id="feedback-15" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-16" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">16. My sister speaks Spanish ________ than I do because she lived in Madrid for three years.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q16" value="a" onchange="markAnswered(16)"> a. more fluently</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q16" value="b" onchange="markAnswered(16)"> b. most fluently</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q16" value="c" onchange="markAnswered(16)"> c. as fluently</label>
+                            </div>
+                            <div id="feedback-16" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PART 2: COMPLETE COMPARATIVES / SUPERLATIVES (6 PTS - 1.5 pts each) -->
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                    <div class="border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-900 text-sm">Part 2: Complete the sentences with the comparative or superlative form of the adjective in brackets. Add <em>the</em> or <em>than</em> where necessary.</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">1.5 points each (6 points total)</p>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div id="qcontainer-17" class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <label class="font-medium text-slate-800 block">17. This is <input type="text" id="q17" oninput="markAnswered(17)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[175px] bg-white font-mono"> (bad) coffee I have ever tasted! Don't drink it.</label>
+                            <div id="feedback-17" class="hidden text-xs mt-1.5 p-1.5 rounded"></div>
+                        </div>
+                        <div id="qcontainer-18" class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <label class="font-medium text-slate-800 block">18. Driving in the city centre is <input type="text" id="q18" oninput="markAnswered(18)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[195px] bg-white font-mono"> (stressful) taking the underground during rush hour.</label>
+                            <div id="feedback-18" class="hidden text-xs mt-1.5 p-1.5 rounded"></div>
+                        </div>
+                        <div id="qcontainer-19" class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <label class="font-medium text-slate-800 block">19. What is <input type="text" id="q19" oninput="markAnswered(19)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[175px] bg-white font-mono"> (far) country you have ever travelled to?</label>
+                            <div id="feedback-19" class="hidden text-xs mt-1.5 p-1.5 rounded"></div>
+                        </div>
+                        <div id="qcontainer-20" class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <label class="font-medium text-slate-800 block">20. Today the weather is slightly <input type="text" id="q20" oninput="markAnswered(20)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[175px] bg-white font-mono"> (good) yesterday—at least it isn't raining!</label>
+                            <div id="feedback-20" class="hidden text-xs mt-1.5 p-1.5 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PART 3: WILL / WON'T / SHALL (9 PTS - 1.5 pts each) -->
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                    <div class="border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-900 text-sm">Part 3: Choose the best option (a, b, or c) to complete the mini-dialogues.</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">1.5 points each (9 points total)</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div id="qcontainer-21" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">21. A: These boxes are really heavy!<br>B: Don't worry, I ________ them to the car for you.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q21" value="a" onchange="markAnswered(21)"> a. 'll carry</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q21" value="b" onchange="markAnswered(21)"> b. carry</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q21" value="c" onchange="markAnswered(21)"> c. 'm carrying</label>
+                            </div>
+                            <div id="feedback-21" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-22" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">22. A: It's really hot in this room. ________ I open the window?<br>B: Yes, please. That would be great.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q22" value="a" onchange="markAnswered(22)"> a. Will</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q22" value="b" onchange="markAnswered(22)"> b. Shall</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q22" value="c" onchange="markAnswered(22)"> c. Do</label>
+                            </div>
+                            <div id="feedback-22" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-23" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">23. A: Please don't tell anyone about my job interview tomorrow.<br>B: I promise I ________ a word to anyone!</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q23" value="a" onchange="markAnswered(23)"> a. won't say</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q23" value="b" onchange="markAnswered(23)"> b. don't say</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q23" value="c" onchange="markAnswered(23)"> c. 'm not saying</label>
+                            </div>
+                            <div id="feedback-23" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-24" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">24. A: Don't worry about your presentation tomorrow. You prepared really well, so I'm sure you ________ nervous.<br>B: Thanks, I hope you're right!</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q24" value="a" onchange="markAnswered(24)"> a. will be</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q24" value="b" onchange="markAnswered(24)"> b. won't be</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q24" value="c" onchange="markAnswered(24)"> c. shall be</label>
+                            </div>
+                            <div id="feedback-24" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-25" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">25. A: I left my wallet at home and I don't have any cash for lunch.<br>B: No problem, I ________ you £15. You can pay me back tomorrow.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q25" value="a" onchange="markAnswered(25)"> a. lend</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q25" value="b" onchange="markAnswered(25)"> b. 'll lend</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q25" value="c" onchange="markAnswered(25)"> c. 'm lending</label>
+                            </div>
+                            <div id="feedback-25" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-26" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">26. A: What would you like to drink?<br>B: I ________ a glass of sparkling water, please.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q26" value="a" onchange="markAnswered(26)"> a. 'll have</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q26" value="b" onchange="markAnswered(26)"> b. have</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q26" value="c" onchange="markAnswered(26)"> c. 'm having</label>
+                            </div>
+                            <div id="feedback-26" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PART 4: EMAIL GAP-FILL (8 PTS - 1 pt each, Q27-Q34) -->
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                    <div class="border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-900 text-sm">
+                            Part 4: Fill in the gaps in the email with the correct form of the verbs in brackets. Use <strong>Present Simple</strong>, <strong>Present Continuous</strong>, <strong>Past Simple</strong>, <strong>Past Continuous</strong>, <strong>be going to</strong>, <strong>will</strong>, or <strong>Present Perfect</strong>.
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">1 point each (8 points total)</p>
+                    </div>
+
+                    <div id="qcontainer-email" class="bg-slate-50 border border-slate-200 p-4 sm:p-5 rounded-xl text-sm leading-loose space-y-3">
+                        <p>Hi Deniz,</p>
+                        <p>
+                            We usually <strong>27.</strong> <input type="text" id="q27" oninput="markAnswered(27)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[190px] bg-white font-mono"> (travel) abroad once a year, and right now I <strong>28.</strong> <input type="text" id="q28" oninput="markAnswered(28)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[190px] bg-white font-mono"> (write) this email from a quiet café in Lisbon! My husband and I <strong>29.</strong> <input type="text" id="q29" oninput="markAnswered(29)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[190px] bg-white font-mono"> (arrive) here three days ago, and we <strong>30.</strong> <input type="text" id="q30" oninput="markAnswered(30)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[215px] bg-white font-mono"> (already / visit) four famous museums.
+                        </p>
+                        <p>
+                            Yesterday afternoon, while we <strong>31.</strong> <input type="text" id="q31" oninput="markAnswered(31)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[190px] bg-white font-mono"> (walk) near the river, it suddenly started to rain. Tomorrow, we <strong>32.</strong> <input type="text" id="q32" oninput="markAnswered(32)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[205px] bg-white font-mono"> (take) a train to Sintra—we bought the tickets online yesterday. I think we <strong>33.</strong> <input type="text" id="q33" oninput="markAnswered(33)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[190px] bg-white font-mono"> (have) a wonderful time there!
+                        </p>
+                        <p>
+                            <strong>34.</strong> <input type="text" id="q34" oninput="markAnswered(34)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[215px] bg-white font-mono"> (you / ever / be) to Portugal? You would love it!
+                        </p>
+                        <p>Best,<br><strong>Selin</strong></p>
+                    </div>
+                    <div id="feedback-email" class="hidden text-xs space-y-1.5 p-3.5 rounded-lg border"></div>
+                </div>
+
+                <!-- PART 5: INFINITIVE WITH TO VS GERUND -ING (8 PTS - 1 pt each, Q35-Q42) -->
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                    <div class="border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-900 text-sm">Part 5: Choose the correct form of the verb (a, b, or c) to complete each sentence.</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">1 point each (8 points total)</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div id="qcontainer-35" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">35. I really enjoy ________ dinner for my friends at the weekend.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q35" value="a" onchange="markAnswered(35)"> a. cooking</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q35" value="b" onchange="markAnswered(35)"> b. to cook</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q35" value="c" onchange="markAnswered(35)"> c. cook</label>
+                            </div>
+                            <div id="feedback-35" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-36" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">36. Don't forget ________ your passport before you leave for the airport!</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q36" value="a" onchange="markAnswered(36)"> a. taking</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q36" value="b" onchange="markAnswered(36)"> b. to take</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q36" value="c" onchange="markAnswered(36)"> c. take</label>
+                            </div>
+                            <div id="feedback-36" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-37" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">37. ________ in the sea every morning is great exercise for your body.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q37" value="a" onchange="markAnswered(37)"> a. Swim</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q37" value="b" onchange="markAnswered(37)"> b. To swimming</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q37" value="c" onchange="markAnswered(37)"> c. Swimming</label>
+                            </div>
+                            <div id="feedback-37" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-38" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">38. We decided ________ a taxi because it was raining heavily.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q38" value="a" onchange="markAnswered(38)"> a. to get</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q38" value="b" onchange="markAnswered(38)"> b. getting</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q38" value="c" onchange="markAnswered(38)"> c. get</label>
+                            </div>
+                            <div id="feedback-38" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-39" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">39. My brother is very good at ________ languages—he speaks four!</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q39" value="a" onchange="markAnswered(39)"> a. learn</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q39" value="b" onchange="markAnswered(39)"> b. to learn</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q39" value="c" onchange="markAnswered(39)"> c. learning</label>
+                            </div>
+                            <div id="feedback-39" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-40" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">40. She went to the shopping centre ________ a new pair of trainers.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q40" value="a" onchange="markAnswered(40)"> a. buying</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q40" value="b" onchange="markAnswered(40)"> b. to buy</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q40" value="c" onchange="markAnswered(40)"> c. buy</label>
+                            </div>
+                            <div id="feedback-40" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-41" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">41. I don't mind ________ early on weekdays, even in winter.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q41" value="a" onchange="markAnswered(41)"> a. getting up</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q41" value="b" onchange="markAnswered(41)"> b. to get up</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q41" value="c" onchange="markAnswered(41)"> c. get up</label>
+                            </div>
+                            <div id="feedback-41" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-42" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">42. Would you like ________ to the cinema with us tonight?</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q42" value="a" onchange="markAnswered(42)"> a. coming</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q42" value="b" onchange="markAnswered(42)"> b. come</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q42" value="c" onchange="markAnswered(42)"> c. to come</label>
+                            </div>
+                            <div id="feedback-42" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PART 6: MODALS OF OBLIGATION (5 PTS - 1 pt each, Q43-Q47) -->
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                    <div class="border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-900 text-sm">Part 6: Choose the correct tense (a, b, or c) to complete each sentence.</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">1 point each (5 points total)</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div id="qcontainer-43" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">43. My sister never ________ coffee, but she ________ a cup right now!</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q43" value="a" onchange="markAnswered(43)"> a. is drinking / drinks</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q43" value="b" onchange="markAnswered(43)"> b. drinks / is drinking</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q43" value="c" onchange="markAnswered(43)"> c. drank / is drinking</label>
+                            </div>
+                            <div id="feedback-43" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-44" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">44. I ________ home when it ________ to rain.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q44" value="a" onchange="markAnswered(44)"> a. walked / started</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q44" value="b" onchange="markAnswered(44)"> b. was walking / was starting</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q44" value="c" onchange="markAnswered(44)"> c. was walking / started</label>
+                            </div>
+                            <div id="feedback-44" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-45" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">45. A: Have you finished the report?<br>B: Yes, I ________ it an hour ago.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q45" value="a" onchange="markAnswered(45)"> a. finished</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q45" value="b" onchange="markAnswered(45)"> b. have finished</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q45" value="c" onchange="markAnswered(45)"> c. was finishing</label>
+                            </div>
+                            <div id="feedback-45" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-46" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <span class="font-medium text-slate-800 block">46. A: Oh no, I've left my wallet at home!<br>B: Don't worry. I ________ you some money.</span>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q46" value="a" onchange="markAnswered(46)"> a. lend</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q46" value="b" onchange="markAnswered(46)"> b. 'll lend</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q46" value="c" onchange="markAnswered(46)"> c. 'm lending</label>
+                            </div>
+                            <div id="feedback-46" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-47" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2 md:col-span-2">
+                            <span class="font-medium text-slate-800 block">47. He ________ already ________ his lunch, so he isn't hungry.</span>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q47" value="a" onchange="markAnswered(47)"> a. did / eat</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q47" value="b" onchange="markAnswered(47)"> b. is / eating</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q47" value="c" onchange="markAnswered(47)"> c. has / eaten</label>
+                            </div>
+                            <div id="feedback-47" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= PAGE 3: VOCABULARY SECTION ================= -->
+            <div id="page-3" class="page-content hidden space-y-6">
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm border-l-4 exam-navy-border flex justify-between items-center">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900">C. VOCABULARY SECTION</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Total: 25 Points (3 Parts)</p>
+                    </div>
+                    <span class="bg-slate-100 text-slate-700 text-xs font-medium px-2.5 py-1 rounded-full border border-slate-200">Page 3 of 4</span>
+                </div>
+
+                <!-- PART 1: MULTIPLE CHOICE (9 PTS - 1.5 pts each, Q48-Q53) -->
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                    <div class="border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-900 text-sm">Part 1: Choose the best option (a, b, or c) to complete each sentence.</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">1.5 points each (9 points total)</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div id="qcontainer-48" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <p class="font-medium text-slate-800">48. The train was very ________ this morning; there were no empty seats, so I stood for the whole journey.</p>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q48" value="a" onchange="markAnswered(48)"> a. quiet</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q48" value="b" onchange="markAnswered(48)"> b. crowded</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q48" value="c" onchange="markAnswered(48)"> c. empty</label>
+                            </div>
+                            <div id="feedback-48" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-49" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <p class="font-medium text-slate-800">49. I love listening ________ music when I travel by train.</p>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q49" value="a" onchange="markAnswered(49)"> a. at</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q49" value="b" onchange="markAnswered(49)"> b. to</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q49" value="c" onchange="markAnswered(49)"> c. for</label>
+                            </div>
+                            <div id="feedback-49" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-50" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <p class="font-medium text-slate-800">50. If we don't hurry up, we are going to ________ our train!</p>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q50" value="a" onchange="markAnswered(50)"> a. lose</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q50" value="b" onchange="markAnswered(50)"> b. fail</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q50" value="c" onchange="markAnswered(50)"> c. miss</label>
+                            </div>
+                            <div id="feedback-50" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-51" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <p class="font-medium text-slate-800">51. My friend lent me €30 last month, and I promised to ________ it ________ on Friday.</p>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q51" value="a" onchange="markAnswered(51)"> a. pay / back</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q51" value="b" onchange="markAnswered(51)"> b. take / off</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q51" value="c" onchange="markAnswered(51)"> c. put / on</label>
+                            </div>
+                            <div id="feedback-51" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-52" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <p class="font-medium text-slate-800">52. That horror film was ________ frightening! I couldn't sleep all night.</p>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q52" value="a" onchange="markAnswered(52)"> a. not very</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q52" value="b" onchange="markAnswered(52)"> b. incredibly</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q52" value="c" onchange="markAnswered(52)"> c. a bit</label>
+                            </div>
+                            <div id="feedback-52" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-53" class="p-3 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                            <p class="font-medium text-slate-800">53. Don't worry about the test. Everybody ________ mistakes sometimes.</p>
+                            <div class="space-y-1 text-xs">
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q53" value="a" onchange="markAnswered(53)"> a. does</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q53" value="b" onchange="markAnswered(53)"> b. makes</label>
+                                <label class="block p-1.5 bg-white rounded border border-slate-200 cursor-pointer"><input type="radio" name="q53" value="c" onchange="markAnswered(53)"> c. takes</label>
+                            </div>
+                            <div id="feedback-53" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PART 2: OPPOSITE VERBS (7.5 PTS - 1.5 pts each, Q54-Q58) -->
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                    <div class="border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-900 text-sm">Part 2: Complete each sentence with the OPPOSITE of the bold verb.</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">1.5 points each (7.5 points total)</p>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div id="qcontainer-54" class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <label class="font-medium text-slate-800 block">54. A: Did you <strong>pass</strong> your driving test yesterday?<br>B: No, unfortunately I <input type="text" id="q54" oninput="markAnswered(54)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[165px] bg-white font-mono"> it.</label>
+                            <div id="feedback-54" class="hidden text-xs mt-1.5 p-1.5 rounded"></div>
+                        </div>
+                        <div id="qcontainer-55" class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <label class="font-medium text-slate-800 block">55. Please <strong>remember</strong> to lock the front door—don't <input type="text" id="q55" oninput="markAnswered(55)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[165px] bg-white font-mono"> it!</label>
+                            <div id="feedback-55" class="hidden text-xs mt-1.5 p-1.5 rounded"></div>
+                        </div>
+                        <div id="qcontainer-56" class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <label class="font-medium text-slate-800 block">56. I <strong>lent</strong> my umbrella to Tom last week, so I wanted to <input type="text" id="q56" oninput="markAnswered(56)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[165px] bg-white font-mono"> one from my sister yesterday.</label>
+                            <div id="feedback-56" class="hidden text-xs mt-1.5 p-1.5 rounded"></div>
+                        </div>
+                        <div id="qcontainer-57" class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <label class="font-medium text-slate-800 block">57. A: What time does your flight <strong>leave</strong> Ankara?<br>B: At 10:00 a.m., and it <input type="text" id="q57" oninput="markAnswered(57)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[165px] bg-white font-mono"> in London at 12:30 p.m.</label>
+                            <div id="feedback-57" class="hidden text-xs mt-1.5 p-1.5 rounded"></div>
+                        </div>
+                        <div id="qcontainer-58" class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <label class="font-medium text-slate-800 block">58. Please <strong>turn off</strong> your mobile phone before the film starts—don't <input type="text" id="q58" oninput="markAnswered(58)" class="border border-slate-300 rounded px-2.5 py-1 text-sm min-w-[180px] bg-white font-mono"> it on until the film finishes.</label>
+                            <div id="feedback-58" class="hidden text-xs mt-1.5 p-1.5 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PART 3: DEFINITIONS MATCHING (8.5 PTS - 1.7 pts each, Q59-Q63) -->
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4">
+                    <div class="border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-900 text-sm">Part 3: Match the definitions with the words in the box. There are TWO extra words.</h3>
+                        <p class="text-xs text-slate-500 mb-2">1.7 points each (8.5 points total)</p>
+                        <div class="bg-slate-100 text-slate-800 text-xs p-2.5 rounded border border-slate-200 font-mono flex flex-wrap gap-2 justify-center">
+                            <span>a passport</span> • <span>a changing room</span> • <span>a receipt</span> • <span>a customer</span> • <span>a ticket</span> • <span>a refund</span> • <span>a suitcase</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 text-sm">
+                        <div id="qcontainer-59" class="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50 gap-2">
+                            <span class="text-slate-800">59. The piece of paper a shop assistant gives you showing what you paid for.</span>
+                            <select id="q59" onchange="markAnswered(59)" class="text-sm border border-slate-300 rounded-md p-1.5 bg-white">
+                                <option value="">-- Select Word --</option>
+                                <option value="a passport">a passport</option>
+                                <option value="a changing room">a changing room</option>
+                                <option value="a receipt">a receipt</option>
+                                <option value="a customer">a customer</option>
+                                <option value="a ticket">a ticket</option>
+                                <option value="a refund">a refund</option>
+                                <option value="a suitcase">a suitcase</option>
+                            </select>
+                            <div id="feedback-59" class="hidden text-xs w-full mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-60" class="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50 gap-2">
+                            <span class="text-slate-800">60. The money a shop gives back to you when you return something you bought.</span>
+                            <select id="q60" onchange="markAnswered(60)" class="text-sm border border-slate-300 rounded-md p-1.5 bg-white">
+                                <option value="">-- Select Word --</option>
+                                <option value="a passport">a passport</option>
+                                <option value="a changing room">a changing room</option>
+                                <option value="a receipt">a receipt</option>
+                                <option value="a customer">a customer</option>
+                                <option value="a ticket">a ticket</option>
+                                <option value="a refund">a refund</option>
+                                <option value="a suitcase">a suitcase</option>
+                            </select>
+                            <div id="feedback-60" class="hidden text-xs w-full mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-61" class="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50 gap-2">
+                            <span class="text-slate-800">61. A small book that you show at the airport when you travel to another country.</span>
+                            <select id="q61" onchange="markAnswered(61)" class="text-sm border border-slate-300 rounded-md p-1.5 bg-white">
+                                <option value="">-- Select Word --</option>
+                                <option value="a passport">a passport</option>
+                                <option value="a changing room">a changing room</option>
+                                <option value="a receipt">a receipt</option>
+                                <option value="a customer">a customer</option>
+                                <option value="a ticket">a ticket</option>
+                                <option value="a refund">a refund</option>
+                                <option value="a suitcase">a suitcase</option>
+                            </select>
+                            <div id="feedback-61" class="hidden text-xs w-full mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-62" class="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50 gap-2">
+                            <span class="text-slate-800">62. You need to buy this before you can travel by train or plane.</span>
+                            <select id="q62" onchange="markAnswered(62)" class="text-sm border border-slate-300 rounded-md p-1.5 bg-white">
+                                <option value="">-- Select Word --</option>
+                                <option value="a passport">a passport</option>
+                                <option value="a changing room">a changing room</option>
+                                <option value="a receipt">a receipt</option>
+                                <option value="a customer">a customer</option>
+                                <option value="a ticket">a ticket</option>
+                                <option value="a refund">a refund</option>
+                                <option value="a suitcase">a suitcase</option>
+                            </select>
+                            <div id="feedback-62" class="hidden text-xs w-full mt-1 p-1.5 rounded"></div>
+                        </div>
+
+                        <div id="qcontainer-63" class="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50 gap-2">
+                            <span class="text-slate-800">63. The small room in a clothes shop where you try clothes on.</span>
+                            <select id="q63" onchange="markAnswered(63)" class="text-sm border border-slate-300 rounded-md p-1.5 bg-white">
+                                <option value="">-- Select Word --</option>
+                                <option value="a passport">a passport</option>
+                                <option value="a changing room">a changing room</option>
+                                <option value="a receipt">a receipt</option>
+                                <option value="a customer">a customer</option>
+                                <option value="a ticket">a ticket</option>
+                                <option value="a refund">a refund</option>
+                                <option value="a suitcase">a suitcase</option>
+                            </select>
+                            <div id="feedback-63" class="hidden text-xs w-full mt-1 p-1.5 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= PAGE 4: SOCIAL ENGLISH SECTION ================= -->
+            <div id="page-4" class="page-content hidden space-y-6">
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm border-l-4 exam-navy-border flex justify-between items-center">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900">D. SOCIAL ENGLISH SECTION</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Total: 10 Points (5 Mini-Dialogues, 2 pts each)</p>
+                    </div>
+                    <span class="bg-slate-100 text-slate-700 text-xs font-medium px-2.5 py-1 rounded-full border border-slate-200">Page 4 of 4</span>
+                </div>
+
+                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-5">
+                    <div class="border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-900 text-sm">Complete the conversations with the sentences from the box. There is ONE extra item.</h3>
+                        <p class="text-xs text-slate-500 mb-3">2 points each (10 points total)</p>
+                        
+                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3.5 text-xs sm:text-sm space-y-1.5 text-slate-800">
+                            <div><strong>a.</strong> Have you got the receipt?</div>
+                            <div><strong>b.</strong> Can I try this jacket on?</div>
+                            <div><strong>c.</strong> Could you tell me where the shoe department is?</div>
+                            <div><strong>d.</strong> This one is too expensive for me.</div>
+                            <div><strong>e.</strong> Do you have this shirt in a medium?</div>
+                            <div><strong>f.</strong> Can I pay by credit card?</div>
+                        </div>
+                    </div>
+
+                    <!-- Q64 -->
+                    <div id="qcontainer-64" class="p-3.5 bg-slate-50 rounded-lg border border-slate-200 space-y-2 text-sm">
+                        <p><strong>64. Customer:</strong> Excuse me. 
+                            <select id="q64" onchange="markAnswered(64)" class="text-sm border border-slate-300 rounded px-2 py-1 bg-white">
+                                <option value="">-- Choose Sentence --</option>
+                                <option value="a">a. Have you got the receipt?</option>
+                                <option value="b">b. Can I try this jacket on?</option>
+                                <option value="c">c. Could you tell me where the shoe department is?</option>
+                                <option value="d">d. This one is too expensive for me.</option>
+                                <option value="e">e. Do you have this shirt in a medium?</option>
+                                <option value="f">f. Can I pay by credit card?</option>
+                            </select> This large is a bit too big for me.</p>
+                        <p class="pl-4 text-slate-700"><strong>Assistant:</strong> Let me check in the stockroom for you.</p>
+                        <div id="feedback-64" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                    </div>
+
+                    <!-- Q65 -->
+                    <div id="qcontainer-65" class="p-3.5 bg-slate-50 rounded-lg border border-slate-200 space-y-2 text-sm">
+                        <p><strong>65. Customer:</strong> Hello, I'd like to return these trainers, please. They don't fit.</p>
+                        <p class="pl-4 text-slate-700"><strong>Assistant:</strong> No problem. 
+                            <select id="q65" onchange="markAnswered(65)" class="text-sm border border-slate-300 rounded px-2 py-1 bg-white">
+                                <option value="">-- Choose Sentence --</option>
+                                <option value="a">a. Have you got the receipt?</option>
+                                <option value="b">b. Can I try this jacket on?</option>
+                                <option value="c">c. Could you tell me where the shoe department is?</option>
+                                <option value="d">d. This one is too expensive for me.</option>
+                                <option value="e">e. Do you have this shirt in a medium?</option>
+                                <option value="f">f. Can I pay by credit card?</option>
+                            </select>
+                        </p>
+                        <div id="feedback-65" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                    </div>
+
+                    <!-- Q66 -->
+                    <div id="qcontainer-66" class="p-3.5 bg-slate-50 rounded-lg border border-slate-200 space-y-2 text-sm">
+                        <p><strong>66. Assistant:</strong> Good morning. Can I help you?</p>
+                        <p class="pl-4 text-slate-700"><strong>Customer:</strong> 
+                            <select id="q66" onchange="markAnswered(66)" class="text-sm border border-slate-300 rounded px-2 py-1 bg-white">
+                                <option value="">-- Choose Sentence --</option>
+                                <option value="a">a. Have you got the receipt?</option>
+                                <option value="b">b. Can I try this jacket on?</option>
+                                <option value="c">c. Could you tell me where the shoe department is?</option>
+                                <option value="d">d. This one is too expensive for me.</option>
+                                <option value="e">e. Do you have this shirt in a medium?</option>
+                                <option value="f">f. Can I pay by credit card?</option>
+                            </select> I'd like to look at some boots.
+                        </p>
+                        <div id="feedback-66" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                    </div>
+
+                    <!-- Q67 -->
+                    <div id="qcontainer-67" class="p-3.5 bg-slate-50 rounded-lg border border-slate-200 space-y-2 text-sm">
+                        <p><strong>67. Customer:</strong> 
+                            <select id="q67" onchange="markAnswered(67)" class="text-sm border border-slate-300 rounded px-2 py-1 bg-white">
+                                <option value="">-- Choose Sentence --</option>
+                                <option value="a">a. Have you got the receipt?</option>
+                                <option value="b">b. Can I try this jacket on?</option>
+                                <option value="c">c. Could you tell me where the shoe department is?</option>
+                                <option value="d">d. This one is too expensive for me.</option>
+                                <option value="e">e. Do you have this shirt in a medium?</option>
+                                <option value="f">f. Can I pay by credit card?</option>
+                            </select>
+                        </p>
+                        <p class="pl-4 text-slate-700"><strong>Assistant:</strong> Yes, of course. The changing rooms are over there on the right.</p>
+                        <div id="feedback-67" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                    </div>
+
+                    <!-- Q68 -->
+                    <div id="qcontainer-68" class="p-3.5 bg-slate-50 rounded-lg border border-slate-200 space-y-2 text-sm">
+                        <p><strong>68. Assistant:</strong> This leather bag is very popular. It's €120.</p>
+                        <p class="pl-4 text-slate-700"><strong>Customer:</strong> Thank you, but 
+                            <select id="q68" onchange="markAnswered(68)" class="text-sm border border-slate-300 rounded px-2 py-1 bg-white">
+                                <option value="">-- Choose Sentence --</option>
+                                <option value="a">a. Have you got the receipt?</option>
+                                <option value="b">b. Can I try this jacket on?</option>
+                                <option value="c">c. Could you tell me where the shoe department is?</option>
+                                <option value="d">d. This one is too expensive for me.</option>
+                                <option value="e">e. Do you have this shirt in a medium?</option>
+                                <option value="f">f. Can I pay by credit card?</option>
+                            </select> Can you show me something cheaper?
+                        </p>
+                        <div id="feedback-68" class="hidden text-xs mt-1 p-1.5 rounded"></div>
+                    </div>
+
+                    <!-- SUBMIT BUTTON AT BOTTOM OF PAGE 4 -->
+                    <div class="pt-4 border-t border-slate-100 flex justify-end">
+                        <button onclick="confirmSubmission()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-6 py-2.5 rounded-lg shadow transition flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            <span>Submit All &amp; Finish</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE NAVIGATION BUTTONS AT FOOTER -->
+            <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex items-center justify-between">
+                <button id="prevPageBtn" onclick="prevPage()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    ← Previous Page
+                </button>
+                <span id="pageIndicator" class="text-xs font-semibold text-slate-500">Page 1 of 4</span>
+                <button id="nextPageBtn" onclick="nextPage()" class="px-4 py-2 exam-navy hover:opacity-90 text-white font-semibold text-xs rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed">
+                    Next Page →
+                </button>
+            </div>
+
+        </main>
+
+        <!-- QUIZ NAVIGATION SIDEBAR (RIGHT) -->
+        <aside class="w-full lg:w-64 flex-shrink-0 space-y-6">
+            <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm sticky top-20 space-y-5">
+                <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-900 text-sm">Question Navigator</h3>
+                    <span id="completionBadge" class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">0 / 68 Answered</span>
+                </div>
+
+                <!-- QUESTION GRID BUTTONS (4 PAGES) -->
+                <div class="space-y-4 text-xs">
+                    <div>
+                        <div class="text-[11px] font-semibold text-slate-400 mb-1">Page 1: A. Reading (1–10)</div>
+                        <div class="grid grid-cols-5 gap-1.5" id="navGrid-p1"></div>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-semibold text-slate-400 mb-1">Page 2: B. Grammar (11–47)</div>
+                        <div class="grid grid-cols-5 gap-1.5" id="navGrid-p2"></div>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-semibold text-slate-400 mb-1">Page 3: C. Vocabulary (48–63)</div>
+                        <div class="grid grid-cols-5 gap-1.5" id="navGrid-p3"></div>
+                    </div>
+                    <div>
+                        <div class="text-[11px] font-semibold text-slate-400 mb-1">Page 4: D. Social Eng. (64–68)</div>
+                        <div class="grid grid-cols-5 gap-1.5" id="navGrid-p4"></div>
+                    </div>
+                </div>
+
+                <!-- SUBMIT SIDEBAR BUTTON -->
+                <div class="pt-3 border-t border-slate-100">
+                    <button onclick="confirmSubmission()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs py-2.5 rounded-lg transition shadow-sm">
+                        Submit All &amp; Finish
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- CONFIRMATION MODAL -->
+    <div id="confirmModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center space-x-3 text-amber-600">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                <h3 class="text-lg font-bold text-slate-900">Submit All &amp; Finish?</h3>
+            </div>
+            <p class="text-sm text-slate-600">
+                Are you sure you want to submit your practice exam? Once submitted, your score out of 100 will be calculated and correct answers will be displayed.
+            </p>
+            <div class="flex justify-end space-x-3 pt-2">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs rounded-lg transition">Cancel</button>
+                <button onclick="submitExam()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs rounded-lg transition shadow">Submit All &amp; Finish</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+
+    <!-- FIREBASE (live progress + per-question results) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof window.__app_id !== 'undefined' ? window.__app_id : 'default-app-id';
+        const USER_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyAqEcznBViQDnmjQmy-K3yDcmWQxUOvnAQ",
+            authDomain: "pin-revision.firebaseapp.com",
+            projectId: "pin-revision",
+            storageBucket: "pin-revision.firebasestorage.app",
+            messagingSenderId: "1005386103431",
+            appId: "1:1005386103431:web:8c2e9c6bb4e4e888fc5622"
+        };
+        const firebaseConfig = (typeof window.__firebase_config !== 'undefined')
+            ? JSON.parse(window.__firebase_config) : USER_FIREBASE_CONFIG;
+
+        let db = null, auth = null, currentUser = null, pendingPayload = null;
+
+        function setDbStatus(ready, message) {
+            const dot = document.getElementById('dbStatusDot');
+            const txt = document.getElementById('dbStatusText');
+            if (!dot || !txt) return;
+            dot.className = ready ? 'w-2 h-2 rounded-full bg-emerald-500' : 'w-2 h-2 rounded-full bg-amber-500';
+            txt.innerText = message;
+        }
+
+        function getSessionCollection(sessionCode) {
+            const safeSession = sessionCode.replace(/[^A-Z0-9_-]/gi, '_');
+            return collection(db, 'artifacts', appId, 'public', 'data', `pin_mt2_a_${safeSession}`);
+        }
+
+        window.syncStudentTelemetry = async function(payload) {
+            if (!payload || !payload.studentName || !payload.sessionCode || !payload.studentDocId) return;
+            if (!db || !currentUser) { pendingPayload = payload; return; }
+            try {
+                const ref = doc(getSessionCollection(payload.sessionCode), payload.studentDocId);
+                await setDoc(ref, {
+                    studentName: String(payload.studentName),
+                    status: String(payload.status || 'online'),
+                    currentQuestion: Number(payload.currentQuestion || 1),
+                    answeredCount: Number(payload.answeredCount || 0),
+                    isSubmitted: Boolean(payload.isSubmitted),
+                    lastSeen: serverTimestamp(),
+                    lastSeenMs: Date.now(),
+                    ...(payload.results ? {
+                        results: payload.results,
+                        totalScore: Number(payload.totalScore || 0),
+                        sectionScores: payload.sectionScores || {}
+                    } : {})
+                }, { merge: true });
+                pendingPayload = null;
+            } catch (err) {
+                console.error('Telemetry sync failed:', err);
+                if (payload.results && !window.__resultsErrShown) {
+                    window.__resultsErrShown = true;
+                    alert('Your results could not be saved for the teacher (' + (err.code || err.message || 'error') + '). Please tell your instructor.');
+                }
+            }
+        };
+
+        async function initSharedStorage() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
+                    currentUser = (await signInWithCustomToken(auth, window.__initial_auth_token)).user;
+                } else {
+                    currentUser = (await signInAnonymously(auth)).user;
+                }
+                setDbStatus(true, 'Ready');
+                if (pendingPayload) window.syncStudentTelemetry(pendingPayload);
+            } catch (err) {
+                console.error('Auth/Storage init error:', err);
+                setDbStatus(false, 'Offline (exam still works)');
+            }
+        }
+        initSharedStorage();
+    </script>
+
+    <script>
+        // ANSWER KEY & POINT WEIGHTS FOR SET A (100 POINTS TOTAL)
+        const answerKey = {
+            // Reading Part 1 (q1-q5: 2 pts each = 10 pts)
+            q1: { ans: "b", pts: 2, cat: "reading" },
+            q2: { ans: "a", pts: 2, cat: "reading" },
+            q3: { ans: "c", pts: 2, cat: "reading" },
+            q4: { ans: "a", pts: 2, cat: "reading" },
+            q5: { ans: "b", pts: 2, cat: "reading" },
+
+            // Reading Part 2 (q6-q10: 2 pts each = 10 pts)
+            q6: { ans: "a", pts: 2, cat: "reading" },
+            q7: { ans: "c", pts: 2, cat: "reading" },
+            q8: { ans: "b", pts: 2, cat: "reading" },
+            q9: { ans: "a", pts: 2, cat: "reading" },
+            q10: { ans: "b", pts: 2, cat: "reading" },
+
+            // Grammar Part 1 (q11-q16: 1.5 pts each = 9 pts)
+            q11: { ans: "a", pts: 1.5, cat: "grammar" },
+            q12: { ans: "b", pts: 1.5, cat: "grammar" },
+            q13: { ans: "a", pts: 1.5, cat: "grammar" },
+            q14: { ans: "c", pts: 1.5, cat: "grammar" },
+            q15: { ans: "b", pts: 1.5, cat: "grammar" },
+            q16: { ans: "a", pts: 1.5, cat: "grammar" },
+
+            // Grammar Part 2 (q17-q20: 1.5 pts each = 6 pts)
+            q17: { ans: ["the worst"], pts: 1.5, cat: "grammar" },
+            q18: { ans: ["more stressful than"], pts: 1.5, cat: "grammar" },
+            q19: { ans: ["the furthest", "the farthest"], pts: 1.5, cat: "grammar" },
+            q20: { ans: ["better than"], pts: 1.5, cat: "grammar" },
+
+            // Grammar Part 3 (q21-q26: 1.5 pts each = 9 pts)
+            q21: { ans: "a", pts: 1.5, cat: "grammar" },
+            q22: { ans: "b", pts: 1.5, cat: "grammar" },
+            q23: { ans: "a", pts: 1.5, cat: "grammar" },
+            q24: { ans: "b", pts: 1.5, cat: "grammar" },
+            q25: { ans: "b", pts: 1.5, cat: "grammar" },
+            q26: { ans: "a", pts: 1.5, cat: "grammar" },
+
+            // Grammar Part 4: Email Gap-Fill (q27-q34: 1 pt each = 8 pts)
+            q27: { ans: ["travel"], pts: 1, cat: "grammar", isEmail: true },
+            q28: { ans: ["am writing", "'m writing"], pts: 1, cat: "grammar", isEmail: true },
+            q29: { ans: ["arrived"], pts: 1, cat: "grammar", isEmail: true },
+            q30: { ans: ["have already visited", "'ve already visited"], pts: 1, cat: "grammar", isEmail: true },
+            q31: { ans: ["were walking"], pts: 1, cat: "grammar", isEmail: true },
+            q32: { ans: ["are taking", "'re taking", "are going to take", "'re going to take"], pts: 1, cat: "grammar", isEmail: true },
+            q33: { ans: ["will have", "'ll have"], pts: 1, cat: "grammar", isEmail: true },
+            q34: { ans: ["have you ever been"], pts: 1, cat: "grammar", isEmail: true },
+
+            // Grammar Part 5: Verb Patterns (q35-q42: 1 pt each = 8 pts)
+            q35: { ans: "a", pts: 1, cat: "grammar" },
+            q36: { ans: "b", pts: 1, cat: "grammar" },
+            q37: { ans: "c", pts: 1, cat: "grammar" },
+            q38: { ans: "a", pts: 1, cat: "grammar" },
+            q39: { ans: "c", pts: 1, cat: "grammar" },
+            q40: { ans: "b", pts: 1, cat: "grammar" },
+            q41: { ans: "a", pts: 1, cat: "grammar" },
+            q42: { ans: "c", pts: 1, cat: "grammar" },
+
+            // Grammar Part 6: Tense review (q43-q47: 1 pt each = 5 pts)
+            q43: { ans: "b", pts: 1, cat: "grammar" },
+            q44: { ans: "c", pts: 1, cat: "grammar" },
+            q45: { ans: "a", pts: 1, cat: "grammar" },
+            q46: { ans: "b", pts: 1, cat: "grammar" },
+            q47: { ans: "c", pts: 1, cat: "grammar" },
+
+            // Vocabulary Part 1 (q48-q53: 1.5 pts each = 9 pts)
+            q48: { ans: "b", pts: 1.5, cat: "vocab" },
+            q49: { ans: "b", pts: 1.5, cat: "vocab" },
+            q50: { ans: "c", pts: 1.5, cat: "vocab" },
+            q51: { ans: "a", pts: 1.5, cat: "vocab" },
+            q52: { ans: "b", pts: 1.5, cat: "vocab" },
+            q53: { ans: "b", pts: 1.5, cat: "vocab" },
+
+            // Vocabulary Part 2: Opposite Verbs (q54-q58: 1.5 pts each = 7.5 pts)
+            q54: { ans: ["failed"], pts: 1.5, cat: "vocab" },
+            q55: { ans: ["forget"], pts: 1.5, cat: "vocab" },
+            q56: { ans: ["borrow"], pts: 1.5, cat: "vocab" },
+            q57: { ans: ["arrives"], pts: 1.5, cat: "vocab" },
+            q58: { ans: ["turn", "turn it on"], pts: 1.5, cat: "vocab" },
+
+            // Vocabulary Part 3: Definitions Matching (q59-q63: 1.7 pts each = 8.5 pts)
+            q59: { ans: "a receipt", pts: 1.7, cat: "vocab" },
+            q60: { ans: "a refund", pts: 1.7, cat: "vocab" },
+            q61: { ans: "a passport", pts: 1.7, cat: "vocab" },
+            q62: { ans: "a ticket", pts: 1.7, cat: "vocab" },
+            q63: { ans: "a changing room", pts: 1.7, cat: "vocab" },
+
+            // Social English (q64-q68: 2 pts each = 10 pts)
+            q64: { ans: "e", pts: 2, cat: "social" },
+            q65: { ans: "a", pts: 2, cat: "social" },
+            q66: { ans: "c", pts: 2, cat: "social" },
+            q67: { ans: "b", pts: 2, cat: "social" },
+            q68: { ans: "d", pts: 2, cat: "social" }
+        };
+
+        let currentPage = 1;
+        let isSubmitted = false;
+        let timerSeconds = 60 * 60; // 60 minutes
+        let timerInterval = null;
+
+        // ---- Student telemetry state ----
+        let activeSessionCode = 'PIN-MT2-A';
+        let activeStudentName = '';
+        let activeStudentDocId = '';
+        let currentQuestionNum = 1;
+        let answeredCount = 0;
+        let lastInteractionMs = Date.now();
+        let heartbeatInterval = null;
+        let submissionExtras = null;
+
+        function buildStudentDocId(name) {
+            const slug = name.trim().toLowerCase().replace(/[^a-z0-9ğüşıöç]+/gi, '_').replace(/^_+|_+$/g, '') || 'student';
+            const suffix = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                ? crypto.randomUUID().slice(0, 8) : Math.random().toString(36).slice(2, 10);
+            return `${slug}_${suffix}`;
+        }
+
+        function handleStudentLogin(e) {
+            e.preventDefault();
+            const rawSession = (document.getElementById('sessionCodeInput').value || 'PIN-MT2-A').trim().toUpperCase();
+            const rawName = document.getElementById('studentNameInput').value.trim();
+            const errBox = document.getElementById('studentLoginError');
+            if (!rawSession || !/^[A-Z0-9_-]+$/.test(rawSession)) {
+                errBox.innerText = 'Session code must contain only letters, numbers, hyphens (-), or underscores (_).';
+                errBox.classList.remove('hidden');
+                return;
+            }
+            if (!rawName || rawName.length < 2) {
+                errBox.innerText = 'Please enter your name.';
+                errBox.classList.remove('hidden');
+                return;
+            }
+            errBox.classList.add('hidden');
+            activeSessionCode = rawSession;
+            activeStudentName = rawName;
+            activeStudentDocId = buildStudentDocId(rawName);
+            lastInteractionMs = Date.now();
+
+            document.getElementById('loginOverlay').classList.add('hidden');
+            const badge = document.getElementById('sessionBadge');
+            badge.classList.remove('hidden');
+            badge.classList.add('flex');
+            document.getElementById('sessionBadgeLabel').innerText = `${activeStudentName} (${activeSessionCode})`;
+
+            startTimer();
+            startStudentPresenceTracking();
+            pushStudentState('online');
+        }
+
+        function recordUserActivity() { lastInteractionMs = Date.now(); }
+
+        function getCurrentPresenceStatus() {
+            if (isSubmitted) return 'online';
+            const isHidden = (document.visibilityState === 'hidden') || !document.hasFocus();
+            const isIdle = (Date.now() - lastInteractionMs) > 45000;
+            return (isHidden || isIdle) ? 'away' : 'online';
+        }
+
+        function pushStudentState(forcedStatus) {
+            if (!activeStudentName || !activeSessionCode || !activeStudentDocId) return;
+            if (typeof window.syncStudentTelemetry === 'function') {
+                window.syncStudentTelemetry({
+                    studentDocId: activeStudentDocId,
+                    studentName: activeStudentName,
+                    sessionCode: activeSessionCode,
+                    status: forcedStatus || getCurrentPresenceStatus(),
+                    currentQuestion: currentQuestionNum,
+                    answeredCount: answeredCount,
+                    isSubmitted: isSubmitted,
+                    ...(submissionExtras || {})
+                });
+            }
+        }
+
+        function startStudentPresenceTracking() {
+            ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart'].forEach(evt => {
+                window.addEventListener(evt, recordUserActivity, { passive: true });
+            });
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') recordUserActivity();
+                pushStudentState(document.visibilityState === 'hidden' ? 'away' : getCurrentPresenceStatus());
+            });
+            window.addEventListener('blur', () => { if (!isSubmitted) pushStudentState('away'); });
+            window.addEventListener('focus', () => { recordUserActivity(); pushStudentState('online'); });
+            window.addEventListener('beforeunload', () => { if (!isSubmitted) pushStudentState('away'); });
+            heartbeatInterval = setInterval(() => pushStudentState(), 5000);
+        }
+
+        function updateCurrentQuestion(qNum) {
+            recordUserActivity();
+            if (currentQuestionNum !== qNum) {
+                currentQuestionNum = qNum;
+                pushStudentState();
+            }
+        }
+
+        function attachQuestionFocusListeners() {
+            for (let i = 1; i <= 68; i++) {
+                if (i >= 27 && i <= 34) {
+                    const inp = document.getElementById(`q${i}`);
+                    if (inp) {
+                        inp.addEventListener('focus', () => updateCurrentQuestion(i));
+                        inp.addEventListener('click', () => updateCurrentQuestion(i));
+                    }
+                } else {
+                    const container = document.getElementById(`qcontainer-${i}`);
+                    if (container) {
+                        container.addEventListener('click', () => updateCurrentQuestion(i));
+                        container.addEventListener('focusin', () => updateCurrentQuestion(i));
+                    }
+                }
+            }
+        }
+
+        window.onload = function() {
+            buildNavGrid();
+            switchPage(1);
+            attachQuestionFocusListeners();
+            // timer starts after the student enters name & session code
+        };
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    submitExam();
+                    return;
+                }
+                timerSeconds--;
+                let m = Math.floor(timerSeconds / 60);
+                let s = timerSeconds % 60;
+                document.getElementById('timerDisplay').innerText = 
+                    `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function buildNavGrid() {
+            const pageMap = {
+                'p1': Array.from({length: 10}, (_, i) => i + 1),
+                'p2': Array.from({length: 37}, (_, i) => i + 11),
+                'p3': Array.from({length: 16}, (_, i) => i + 48),
+                'p4': Array.from({length: 5}, (_, i) => i + 64)
+            };
+
+            for (let key in pageMap) {
+                const container = document.getElementById(`navGrid-${key}`);
+                container.innerHTML = '';
+                pageMap[key].forEach(qNum => {
+                    const btn = document.createElement('button');
+                    btn.id = `navbtn-${qNum}`;
+                    btn.innerText = qNum;
+                    btn.className = 'w-full py-1 text-center rounded border border-slate-300 bg-white font-medium text-slate-700 hover:bg-slate-100 transition text-[11px]';
+                    btn.onclick = () => {
+                        let targetP = key === 'p1' ? 1 : key === 'p2' ? 2 : key === 'p3' ? 3 : 4;
+                        switchPage(targetP);
+                        setTimeout(() => {
+                            const el = (qNum >= 27 && qNum <= 34)
+                                ? document.getElementById(`q${qNum}`)
+                                : document.getElementById(`qcontainer-${qNum}`);
+                            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 100);
+                    };
+                    container.appendChild(btn);
+                });
+            }
+        }
+
+        function switchPage(pageNum) {
+            currentPage = pageNum;
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`page-${i}`).classList.add('hidden');
+                const tab = document.getElementById(`tab-${i}`);
+                if (i === pageNum) {
+                    tab.className = 'flex-1 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2 exam-navy text-white shadow-sm';
+                } else {
+                    tab.className = 'flex-1 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition flex items-center justify-center space-x-2 text-slate-600 hover:bg-slate-100';
+                }
+            }
+            document.getElementById(`page-${pageNum}`).classList.remove('hidden');
+            document.getElementById('prevPageBtn').disabled = (pageNum === 1);
+            document.getElementById('nextPageBtn').disabled = (pageNum === 4);
+            document.getElementById('pageIndicator').innerText = `Page ${pageNum} of 4`;
+
+            const defaultQByPage = { 1: 1, 2: 11, 3: 48, 4: 64 };
+            updateCurrentQuestion(defaultQByPage[pageNum] || 1);
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function nextPage() { if (currentPage < 4) switchPage(currentPage + 1); }
+        function prevPage() { if (currentPage > 1) switchPage(currentPage - 1); }
+
+        function toggleMobileReading() {
+            const container = document.getElementById('readingPassageContainer');
+            const label = document.getElementById('mobileToggleText');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                label.innerText = "Hide Reading Text";
+            } else {
+                container.classList.add('hidden');
+                container.classList.add('lg:block');
+                label.innerText = "Show Reading Text";
+            }
+        }
+
+        function markAnswered(qNum) {
+            recordUserActivity();
+            currentQuestionNum = qNum;
+            const btn = document.getElementById(`navbtn-${qNum}`);
+            if (!btn) return;
+            const val = getFieldAnswer(`q${qNum}`);
+            if (val.length > 0) {
+                btn.className = 'w-full py-1 text-center rounded border exam-navy-border exam-navy text-white font-bold transition text-[11px]';
+            } else {
+                btn.className = 'w-full py-1 text-center rounded border border-slate-300 bg-white font-medium text-slate-700 hover:bg-slate-100 transition text-[11px]';
+            }
+            updateCompletionCounter();
+            pushStudentState();
+        }
+
+        function updateCompletionCounter() {
+            let count = 0;
+            for (let i = 1; i <= 68; i++) {
+                const btn = document.getElementById(`navbtn-${i}`);
+                if (btn && btn.classList.contains('exam-navy')) count++;
+            }
+            answeredCount = count;
+            document.getElementById('completionBadge').innerText = `${count} / 68 Answered`;
+        }
+
+        function confirmSubmission() {
+            if (isSubmitted) return;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+        }
+
+        function norm(str) {
+            return (str || '').toString().trim().toLowerCase().replace(/’/g, "'").replace(/\s+/g, ' ');
+        }
+
+        function getFieldAnswer(fieldName) {
+            const el = document.getElementById(fieldName);
+            if (el) return el.value.trim();
+            const radios = document.getElementsByName(fieldName);
+            if (radios && radios.length > 0) {
+                for (let r of radios) {
+                    if (r.checked) return r.value;
+                }
+            }
+            return '';
+        }
+
+        function checkMatch(userAns, target) {
+            if (Array.isArray(target)) {
+                return target.some(t => norm(t) === norm(userAns));
+            }
+            return norm(target) === norm(userAns);
+        }
+
+        function submitExam() {
+            closeModal();
+            isSubmitted = true;
+            recordUserActivity();
+            clearInterval(timerInterval);
+            document.getElementById('headerSubmitBtn').classList.add('hidden');
+
+            const perQuestionResults = {};
+            let scoreReading = 0;
+            let scoreGrammar = 0;
+            let scoreVocab = 0;
+            let scoreSocial = 0;
+            let emailResultsHtml = [];
+
+            for (let i = 1; i <= 68; i++) {
+                const key = `q${i}`;
+                const item = answerKey[key];
+                const userAns = getFieldAnswer(key);
+                const isCorrect = checkMatch(userAns, item.ans);
+                const displayAns = Array.isArray(item.ans) ? item.ans.join(' / ') : item.ans;
+                perQuestionResults[key] = { a: String(userAns || ''), c: isCorrect ? 1 : 0, k: String(displayAns) };
+
+                if (isCorrect) {
+                    if (item.cat === 'reading') scoreReading += item.pts;
+                    if (item.cat === 'grammar') scoreGrammar += item.pts;
+                    if (item.cat === 'vocab') scoreVocab += item.pts;
+                    if (item.cat === 'social') scoreSocial += item.pts;
+                }
+
+                // Update sidebar button color on review
+                const navBtn = document.getElementById(`navbtn-${i}`);
+                if (navBtn) {
+                    navBtn.className = isCorrect
+                        ? 'w-full py-1 text-center rounded border border-emerald-600 bg-emerald-600 text-white font-bold transition text-[11px]'
+                        : 'w-full py-1 text-center rounded border border-rose-600 bg-rose-600 text-white font-bold transition text-[11px]';
+                }
+
+                if (item.isEmail) {
+                    const inputEl = document.getElementById(key);
+                    if (inputEl) {
+                        inputEl.classList.remove('border-slate-300', 'bg-white');
+                        inputEl.classList.add(isCorrect ? 'border-emerald-500' : 'border-rose-500', isCorrect ? 'bg-emerald-50' : 'bg-rose-50');
+                    }
+                    if (isCorrect) {
+                        emailResultsHtml.push(`<span class="text-emerald-800 font-semibold">Gap ${i}: ✓ Correct (${userAns})</span>`);
+                    } else {
+                        emailResultsHtml.push(`<span class="text-rose-800 font-semibold">Gap ${i}: ✗ Correct answer: ${displayAns}</span>`);
+                    }
+                } else {
+                    const container = document.getElementById(`qcontainer-${i}`);
+                    const fb = document.getElementById(`feedback-${i}`);
+                    if (container) {
+                        container.classList.remove('bg-slate-50/40', 'bg-slate-50');
+                        container.classList.add(isCorrect ? 'bg-emerald-50/80' : 'bg-rose-50/80', isCorrect ? 'border-emerald-300' : 'border-rose-300');
+                    }
+                    if (fb) {
+                        fb.classList.remove('hidden');
+                        if (isCorrect) {
+                            fb.className = 'text-xs mt-1.5 p-2 rounded bg-emerald-100 text-emerald-900 font-medium';
+                            fb.innerHTML = `✓ Correct (+${item.pts} pts)`;
+                        } else {
+                            fb.className = 'text-xs mt-1.5 p-2 rounded bg-rose-100 text-rose-900 font-medium';
+                            fb.innerHTML = `✗ Incorrect. Correct answer: <strong>${displayAns}</strong>`;
+                        }
+                    }
+                }
+            }
+
+            const emailFb = document.getElementById('feedback-email');
+            emailFb.classList.remove('hidden');
+            emailFb.className = 'text-xs space-y-1 p-3.5 rounded-lg border bg-white border-slate-200 flex flex-col gap-1';
+            emailFb.innerHTML = emailResultsHtml.join('');
+
+            // Round cleanly to avoid floating-point artifacts
+            scoreReading = Math.round(scoreReading * 10) / 10;
+            scoreGrammar = Math.round(scoreGrammar * 10) / 10;
+            scoreVocab = Math.round(scoreVocab * 10) / 10;
+            scoreSocial = Math.round(scoreSocial * 10) / 10;
+            const totalScore = Math.round((scoreReading + scoreGrammar + scoreVocab + scoreSocial) * 10) / 10;
+
+            submissionExtras = {
+                results: perQuestionResults,
+                totalScore: totalScore,
+                sectionScores: { reading: scoreReading, grammar: scoreGrammar, vocab: scoreVocab, social: scoreSocial }
+            };
+            pushStudentState('online');
+
+            document.getElementById('totalScoreVal').innerText = `${totalScore} / 100`;
+            document.getElementById('readingScoreVal').innerText = `${scoreReading} / 20`;
+            document.getElementById('grammarScoreVal').innerText = `${scoreGrammar} / 45`;
+            document.getElementById('vocabScoreVal').innerText = `${scoreVocab} / 25`;
+            document.getElementById('socialScoreVal').innerText = `${scoreSocial} / 10`;
+
+            document.getElementById('reviewBanner').classList.remove('hidden');
+            document.querySelectorAll('input, select').forEach(el => el.disabled = true);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetExam() {
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
