@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIN Mid-Term 2 Revision — Practice Exam A | Teacher Live Progress Monitor</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .exam-navy { background-color: #1e3a5f; }
+        .exam-navy-text { color: #1e3a5f; }
+        .exam-navy-border { border-color: #1e3a5f; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col antialiased selection:bg-blue-100 selection:text-blue-900">
+
+    <!-- TOP TEACHER HEADER -->
+    <header class="exam-navy text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5">
+            <!-- Title & Subtitle -->
+            <div class="flex items-start sm:items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center font-extrabold text-sm tracking-wide flex-shrink-0">
+                    LIVE
+                </div>
+                <div>
+                    <h1 class="text-sm sm:text-base font-bold tracking-tight text-white">
+                        PIN Mid-Term 2 Revision — Practice Exam A <span class="text-blue-200 font-normal">| Teacher Live Progress Monitor</span>
+                    </h1>
+                    <div class="flex flex-wrap items-center gap-2 text-[11px] text-blue-200 mt-0.5">
+                        <span class="inline-flex items-center gap-1.5">
+                            <span id="connDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                            <span id="connStatusText">Connecting to shared session...</span>
+                        </span>
+                        <span>•</span>
+                        <span id="lastRefreshLabel" class="font-mono text-blue-100">Auto-refresh: 3s</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Switcher & Reset Controls -->
+            <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                <form onsubmit="handleSessionSwitch(event)" class="flex items-center bg-slate-900/40 border border-white/20 rounded-xl p-1">
+                    <label for="sessionInput" class="text-[11px] font-medium text-blue-200 pl-2.5 pr-1.5 hidden sm:inline">Session:</label>
+                    <input type="text" id="sessionInput" value="PIN-MT2-A" maxlength="32" autocomplete="off"
+                        class="w-28 sm:w-32 bg-white text-slate-900 font-mono font-bold text-xs uppercase px-2.5 py-1.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400"
+                        placeholder="PIN-MT2-A">
+                    <button type="submit"
+                        class="ml-1.5 bg-blue-500 hover:bg-blue-400 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition shadow-sm whitespace-nowrap">
+                        Connect / Switch
+                    </button>
+                </form>
+
+                <button onclick="manualRefreshNow()"
+                    class="bg-white/15 hover:bg-white/25 text-white border border-white/20 font-semibold text-xs px-3 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <span>Refresh</span>
+                </button>
+
+                <button onclick="openClearModal()"
+                    class="bg-rose-600/90 hover:bg-rose-600 text-white border border-rose-400/30 font-semibold text-xs px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    <span>Clear Session Records</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN MONITOR WORKSPACE -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+        <!-- SUMMARY KPI CARDS -->
+        <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+            <!-- Total Joined -->
+            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Joined</span>
+                    <span class="p-1.5 rounded-lg bg-slate-100 text-slate-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    </span>
+                </div>
+                <div id="kpiTotal" class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">0</div>
+                <p class="text-[11px] text-slate-400 mt-0.5">Active session roster</p>
+            </div>
+
+            <!-- Online Now -->
+            <div class="bg-white border border-emerald-200 rounded-xl p-4 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Online Now</span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                </div>
+                <div id="kpiOnline" class="text-2xl sm:text-3xl font-extrabold text-emerald-700 mt-2">0</div>
+                <p class="text-[11px] text-emerald-600/80 mt-0.5">Active on exam tab</p>
+            </div>
+
+            <!-- Away / Inactive -->
+            <div class="bg-white border border-amber-200 rounded-xl p-4 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-amber-700 uppercase tracking-wider">Away / Inactive</span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                </div>
+                <div id="kpiAway" class="text-2xl sm:text-3xl font-extrabold text-amber-700 mt-2">0</div>
+                <p class="text-[11px] text-amber-600/80 mt-0.5">Tab hidden or idle &gt;55s</p>
+            </div>
+
+            <!-- Submitted -->
+            <div class="bg-white border border-blue-200 rounded-xl p-4 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold exam-navy-text uppercase tracking-wider">Submitted</span>
+                    <span class="p-1.5 rounded-lg bg-blue-50 exam-navy-text">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </span>
+                </div>
+                <div id="kpiSubmitted" class="text-2xl sm:text-3xl font-extrabold exam-navy-text mt-2">0</div>
+                <p class="text-[11px] text-slate-400 mt-0.5">Completed &amp; finished</p>
+            </div>
+
+            <!-- Average Completion -->
+            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm col-span-2 sm:col-span-1">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Avg. Completion</span>
+                    <span id="kpiAvgPct" class="text-[11px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">0%</span>
+                </div>
+                <div id="kpiAvgAnswered" class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">0.0 <span class="text-sm font-semibold text-slate-400">/ 68</span></div>
+                <p class="text-[11px] text-slate-400 mt-0.5">Questions answered</p>
+            </div>
+        </section>
+
+        <!-- FILTER, SEARCH & SORT CONTROLS -->
+        <section class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5">
+            <!-- Status Filter Pills -->
+            <div class="flex flex-wrap items-center gap-1.5">
+                <button onclick="setStatusFilter('all')" id="filter-all" class="px-3 py-1.5 rounded-lg text-xs font-semibold exam-navy text-white transition">
+                    All (<span id="count-all">0</span>)
+                </button>
+                <button onclick="setStatusFilter('online')" id="filter-online" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                    Online (<span id="count-online">0</span>)
+                </button>
+                <button onclick="setStatusFilter('away')" id="filter-away" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                    Away (<span id="count-away">0</span>)
+                </button>
+                <button onclick="setStatusFilter('in_progress')" id="filter-in_progress" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                    In Progress (<span id="count-in_progress">0</span>)
+                </button>
+                <button onclick="setStatusFilter('submitted')" id="filter-submitted" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                    Submitted (<span id="count-submitted">0</span>)
+                </button>
+            </div>
+
+            <!-- Search & Sort -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                <div class="relative">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" id="searchInput" oninput="renderStudentList()" placeholder="Search student name..."
+                        class="w-full sm:w-56 pl-9 pr-3 py-1.5 border border-slate-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900">
+                </div>
+
+                <div class="flex items-center gap-1.5">
+                    <label for="sortSelect" class="text-xs font-medium text-slate-500 whitespace-nowrap">Sort by:</label>
+                    <select id="sortSelect" onchange="renderStudentList()" class="border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white font-medium text-slate-700 focus:outline-none focus:border-blue-900">
+                        <option value="status">Live Status (Online First)</option>
+                        <option value="name_asc">Name (A → Z)</option>
+                        <option value="progress_desc">Progress (High → Low)</option>
+                        <option value="progress_asc">Progress (Low → High)</option>
+                        <option value="question_desc">Current Question (High → Low)</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- LIVE STUDENT PROGRESS TABLE (DESKTOP) & CARDS (MOBILE) -->
+        <section class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <div class="px-5 py-3.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/60">
+                <div class="flex items-center gap-2">
+                    <h2 class="text-sm font-bold text-slate-900">Live Student Progress</h2>
+                    <span id="activeSessionTag" class="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-blue-100 exam-navy-text">PIN-MT2-A</span>
+                </div>
+                <span id="visibleCountLabel" class="text-xs text-slate-500">Showing 0 students</span>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="p-10 text-center space-y-2">
+                <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                </div>
+                <h3 class="text-sm font-bold text-slate-800">No students in this session yet</h3>
+                <p class="text-xs text-slate-500 max-w-md mx-auto">
+                    Share Session Code <strong id="emptySessionCode" class="font-mono text-slate-700">PIN-MT2-A</strong> with your students. As soon as they enter their name and start the exam, their live progress will appear here automatically.
+                </p>
+            </div>
+
+            <!-- Desktop Table -->
+            <div id="desktopTableWrapper" class="hidden md:block overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                            <th class="py-3 px-5">Student Name</th>
+                            <th class="py-3 px-4">Live Status</th>
+                            <th class="py-3 px-4">Current Question &amp; Section</th>
+                            <th class="py-3 px-4 w-56">Answered Progress</th>
+                            <th class="py-3 px-4">Submission</th>
+                            <th class="py-3 px-4">Score</th>
+                            <th class="py-3 px-5 text-right">Last Activity</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div id="mobileCardsWrapper" class="md:hidden divide-y divide-slate-100"></div>
+        </section>
+
+        <!-- QUESTION ANALYSIS -->
+        <section class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-sm font-bold text-slate-900">Question Analysis (submitted students)</h2>
+                    <p id="analysisSubtitle" class="text-xs text-slate-500 mt-0.5">No submissions yet.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <select id="analysisSort" onchange="renderAnalysis()" class="border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs bg-white font-medium text-slate-700">
+                        <option value="q">Order: Question No.</option>
+                        <option value="hardest">Order: Most missed first</option>
+                    </select>
+                    <button onclick="exportResultsCsv()" class="bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs px-3 py-2 rounded-lg transition">Download CSV</button>
+                </div>
+            </div>
+            <div id="analysisSummary" class="grid grid-cols-1 lg:grid-cols-3 gap-3 p-4 border-b border-slate-200 bg-slate-50/60"></div>
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="border-b border-slate-200 bg-slate-50 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                            <th class="py-2.5 px-4">Q</th>
+                            <th class="py-2.5 px-4">Section</th>
+                            <th class="py-2.5 px-4">Correct answer</th>
+                            <th class="py-2.5 px-4 w-56">Correct rate</th>
+                            <th class="py-2.5 px-4">Correct / Total</th>
+                            <th class="py-2.5 px-4">Most common wrong answer</th>
+                        </tr>
+                    </thead>
+                    <tbody id="analysisBody" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- PRIVACY & DATA GOVERNANCE FOOTER -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6 w-full">
+        <div class="bg-slate-100 border border-slate-200 rounded-xl p-3.5 text-[11px] text-slate-600 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+                <strong class="text-slate-800">Privacy &amp; Data Notice:</strong> This dashboard reads only live progress metadata (student name, online/away status, current question number, answered count, and submission state). After a student submits, their per-question answers, correctness and score are also stored in the shared session so you can review them here.
+            </div>
+            <div class="text-slate-500 sm:text-right flex-shrink-0">
+                Shared Firebase session • Keep monitor link private
+            </div>
+        </div>
+    </footer>
+
+    <!-- CLEAR SESSION CONFIRMATION MODAL -->
+    <div id="clearModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div class="flex items-center gap-3 text-rose-600">
+                <div class="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">Clear Session Records?</h3>
+                    <p class="text-xs text-slate-500">Session: <span id="modalSessionName" class="font-mono font-bold text-slate-700">PIN-MT2-A</span></p>
+                </div>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                This will remove all student progress records from the current session so you can start fresh before a new class. Active students will re-appear automatically if they are still taking the exam.
+            </p>
+            <div class="flex justify-end gap-2.5 pt-2">
+                <button onclick="closeClearModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition">
+                    Cancel
+                </button>
+                <button id="confirmClearBtn" onclick="clearCurrentSessionRecords()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-lg transition shadow-sm">
+                    Yes, Clear Records
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE MODULE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, onSnapshot, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof window.__app_id !== 'undefined' ? window.__app_id : 'default-app-id';
+        // ====== FIREBASE AYARLARI: Firebase Console > Project settings > Your apps > firebaseConfig ======
+        // Bu blok öğrenci ve öğretmen dosyasında AYNI olmalı.
+        const USER_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyAqEcznBViQDnmjQmy-K3yDcmWQxUOvnAQ",
+            authDomain: "pin-revision.firebaseapp.com",
+            projectId: "pin-revision",
+            storageBucket: "pin-revision.firebasestorage.app",
+            messagingSenderId: "1005386103431",
+            appId: "1:1005386103431:web:8c2e9c6bb4e4e888fc5622"
+        };
+        const firebaseConfig = (typeof window.__firebase_config !== 'undefined')
+            ? JSON.parse(window.__firebase_config)
+            : (USER_FIREBASE_CONFIG.apiKey.startsWith("BURAYA") ? null : USER_FIREBASE_CONFIG);
+        // ==========================================================================================
+
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        let activeUnsubscribe = null;
+        let currentSessionCode = 'PIN-MT2-A';
+        let rawStudentsMap = new Map();
+        let activeFilter = 'all';
+
+        const TOTAL_QUESTIONS = 68;
+        const AWAY_THRESHOLD_MS = 55000; // 55 seconds
+
+        function updateConnectionBadge(connected, label) {
+            const dot = document.getElementById('connDot');
+            const text = document.getElementById('connStatusText');
+            if (!dot || !text) return;
+            dot.className = connected
+                ? 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse'
+                : 'w-2 h-2 rounded-full bg-rose-400';
+            text.innerText = label;
+        }
+
+        function getSectionMetadata(qNum) {
+            const q = Number(qNum) || 1;
+            if (q >= 1 && q <= 10) return { label: 'Page 1 • A. Reading', badgeClass: 'bg-indigo-50 text-indigo-700 border-indigo-200' };
+            if (q >= 11 && q <= 47) return { label: 'Page 2 • B. Grammar', badgeClass: 'bg-sky-50 text-sky-700 border-sky-200' };
+            if (q >= 48 && q <= 63) return { label: 'Page 3 • C. Vocabulary', badgeClass: 'bg-purple-50 text-purple-700 border-purple-200' };
+            if (q >= 64 && q <= 68) return { label: 'Page 4 • D. Social English', badgeClass: 'bg-teal-50 text-teal-700 border-teal-200' };
+            return { label: 'Page 1 • A. Reading', badgeClass: 'bg-slate-100 text-slate-700 border-slate-200' };
+        }
+
+        function resolveLastSeenMs(data) {
+            if (data && data.lastSeen && typeof data.lastSeen.toMillis === 'function') {
+                return data.lastSeen.toMillis();
+            }
+            if (data && typeof data.lastSeenMs === 'number') {
+                return data.lastSeenMs;
+            }
+            return 0;
+        }
+
+        function formatRelativeTime(lastSeenMs) {
+            if (!lastSeenMs) return 'Unknown';
+            const diffSec = Math.max(0, Math.floor((Date.now() - lastSeenMs) / 1000));
+            if (diffSec < 6) return 'Just now';
+            if (diffSec < 60) return `${diffSec}s ago`;
+            const diffMin = Math.floor(diffSec / 60);
+            if (diffMin < 60) return `${diffMin}m ${diffSec % 60}s ago`;
+            const diffHr = Math.floor(diffMin / 60);
+            return `${diffHr}h ${diffMin % 60}m ago`;
+        }
+
+        function deriveEffectiveStatus(student) {
+            if (student.isSubmitted) return 'submitted';
+            const ageMs = Date.now() - student.lastSeenMs;
+            if (student.rawStatus === 'away' || ageMs > AWAY_THRESHOLD_MS) {
+                return 'away';
+            }
+            return 'online';
+        }
+
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function getSessionStudentsCollection(sessionCode) {
+            const safeSession = sessionCode.replace(/[^A-Z0-9_-]/gi, '_');
+            const collectionName = `pin_mt2_a_${safeSession}`;
+            return collection(db, 'artifacts', appId, 'public', 'data', collectionName);
+        }
+
+        function applySnapshotDocs(snapshot) {
+            const nextMap = new Map();
+            snapshot.forEach((docSnap) => {
+                const d = docSnap.data() || {};
+                // Progress metadata + (after submission) per-question results
+                nextMap.set(docSnap.id, {
+                    id: docSnap.id,
+                    studentName: d.studentName ? String(d.studentName) : 'Unnamed Student',
+                    rawStatus: d.status === 'away' ? 'away' : 'online',
+                    currentQuestion: Math.min(TOTAL_QUESTIONS, Math.max(1, Number(d.currentQuestion) || 1)),
+                    answeredCount: Math.min(TOTAL_QUESTIONS, Math.max(0, Number(d.answeredCount) || 0)),
+                    isSubmitted: Boolean(d.isSubmitted),
+                    results: (d.results && typeof d.results === 'object') ? d.results : null,
+                    totalScore: typeof d.totalScore === 'number' ? d.totalScore : null,
+                    sectionScores: d.sectionScores || null,
+                    lastSeenMs: resolveLastSeenMs(d)
+                });
+            });
+            rawStudentsMap = nextMap;
+            window.renderStudentList();
+        }
+
+        async function fetchSessionNow() {
+            if (!db || !currentUser) return;
+            try {
+                const colRef = getSessionStudentsCollection(currentSessionCode);
+                const snap = await getDocs(colRef);
+                applySnapshotDocs(snap);
+                updateConnectionBadge(true, `Connected • Session ${currentSessionCode}`);
+            } catch (err) {
+                console.error('Polling fetch error:', err);
+                updateConnectionBadge(false, `Sync error: ${err.code || err.message || 'Check connection'}`);
+            }
+        }
+
+        window.manualRefreshNow = function() {
+            fetchSessionNow();
+        };
+
+        function subscribeToSession(sessionCode) {
+            if (!db || !currentUser) return;
+            if (activeUnsubscribe) {
+                activeUnsubscribe();
+                activeUnsubscribe = null;
+            }
+
+            currentSessionCode = sessionCode;
+            rawStudentsMap.clear();
+            document.getElementById('activeSessionTag').innerText = sessionCode;
+            document.getElementById('emptySessionCode').innerText = sessionCode;
+            document.getElementById('modalSessionName').innerText = sessionCode;
+            updateConnectionBadge(true, `Connected • Session ${sessionCode}`);
+
+            const colRef = getSessionStudentsCollection(sessionCode);
+            activeUnsubscribe = onSnapshot(
+                colRef,
+                (snapshot) => {
+                    applySnapshotDocs(snapshot);
+                    updateConnectionBadge(true, `Connected • Session ${sessionCode}`);
+                },
+                (err) => {
+                    console.error('Firestore listener error:', err);
+                    updateConnectionBadge(false, `Sync error: ${err.code || err.message || 'Check connection'}`);
+                }
+            );
+
+            fetchSessionNow();
+        }
+        window.subscribeToSession = subscribeToSession;
+        window.handleSessionSwitch = function(e) {
+            e.preventDefault();
+            const input = document.getElementById('sessionInput');
+            const clean = (input.value || 'PIN-MT2-A').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
+            if (!clean) return;
+            input.value = clean;
+            subscribeToSession(clean);
+            window.renderStudentList();
+        };
+
+        window.setStatusFilter = function(filterKey) {
+            activeFilter = filterKey;
+            ['all', 'online', 'away', 'in_progress', 'submitted'].forEach((key) => {
+                const btn = document.getElementById(`filter-${key}`);
+                if (!btn) return;
+                if (key === filterKey) {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold exam-navy text-white transition shadow-sm';
+                } else {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+                }
+            });
+            window.renderStudentList();
+        };
+
+        window.openClearModal = function() {
+            document.getElementById('modalSessionName').innerText = currentSessionCode;
+            document.getElementById('clearModal').classList.remove('hidden');
+        };
+
+        window.closeClearModal = function() {
+            document.getElementById('clearModal').classList.add('hidden');
+        };
+
+        window.clearCurrentSessionRecords = async function() {
+            if (!db || !currentUser) return;
+            const btn = document.getElementById('confirmClearBtn');
+            btn.disabled = true;
+            btn.innerText = 'Clearing...';
+            try {
+                const colRef = getSessionStudentsCollection(currentSessionCode);
+                const snap = await getDocs(colRef);
+                const deletePromises = [];
+                snap.forEach((docSnap) => {
+                    deletePromises.push(deleteDoc(doc(colRef, docSnap.id)));
+                });
+                await Promise.all(deletePromises);
+                rawStudentsMap.clear();
+                window.renderStudentList();
+                window.closeClearModal();
+            } catch (err) {
+                console.error('Error clearing session records:', err);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Yes, Clear Records';
+            }
+        };
+
+
+        const expandedIds = new Set();
+        function sectionKeyOf(q) {
+            if (q <= 10) return 'Reading';
+            if (q <= 47) return 'Grammar';
+            if (q <= 63) return 'Vocabulary';
+            return 'Social English';
+        }
+        window.toggleDetail = function(id) {
+            if (expandedIds.has(id)) expandedIds.delete(id); else expandedIds.add(id);
+            window.renderStudentList();
+        };
+        function miniStripHtml(s) {
+            if (!s.isSubmitted || !s.results) return '';
+            let wrongCount = 0, chips = '';
+            for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+                const r = s.results['q' + i];
+                if (!r) continue;
+                const ok = r.c === 1;
+                if (!ok) wrongCount++;
+                chips += `<span class="inline-flex items-center justify-center w-6 h-5 rounded text-[10px] font-bold ${ok ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-500 text-white'}" title="Q${i}: ${ok ? 'correct' : 'wrong'}">${i}</span>`;
+            }
+            const right = TOTAL_QUESTIONS - wrongCount;
+            return `<div class="mt-1.5 max-w-xl">
+                <div class="text-[11px] font-semibold mb-1"><span class="text-emerald-700">✓ ${right} correct</span> <span class="text-slate-300">|</span> <span class="text-rose-600">✗ ${wrongCount} wrong</span></div>
+                <div class="flex flex-wrap gap-0.5">${chips}</div>
+            </div>`;
+        }
+        function scoreCellHtml(s) {
+            if (!s.isSubmitted) return '<span class="text-slate-400 text-xs">—</span>';
+            if (s.totalScore === null) return '<span class="text-slate-400 text-xs" title="Submitted before result tracking was added">n/a</span>';
+            return `<span class="font-mono font-bold text-xs text-slate-900">${s.totalScore.toFixed(2)} / 100</span>`;
+        }
+        function detailHtml(s) {
+            if (!s.isSubmitted) return '<div class="text-xs text-slate-500">Details appear after the student submits.</div>';
+            if (!s.results) return '<div class="text-xs text-slate-500">This student submitted before per-question tracking was added, so no detail is available.</div>';
+            const ss = s.sectionScores || {};
+            const secLine = s.sectionScores
+                ? `<div class="flex flex-wrap gap-2 text-[11px] font-semibold mb-3">
+                    <span class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">Reading ${ss.reading ?? 0} / 20</span>
+                    <span class="px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">Grammar ${ss.grammar ?? 0} / 45</span>
+                    <span class="px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">Vocabulary ${ss.vocab ?? 0} / 25</span>
+                    <span class="px-2 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200">Social ${ss.social ?? 0} / 10</span>
+                   </div>` : '';
+            let cells = '';
+            for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+                const r = s.results['q' + i];
+                if (!r) continue;
+                const ok = r.c === 1;
+                const given = r.a ? escapeHtml(r.a) : '(blank)';
+                const tip = ok ? `Q${i}: ${given}` : `Q${i}: answered ${given} | correct: ${escapeHtml(r.k || '')}`;
+                cells += `<div title="${tip}" class="rounded-lg border px-2 py-1.5 text-[11px] leading-tight ${ok ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-rose-50 border-rose-200 text-rose-800'}">
+                    <div class="font-bold">Q${i} ${ok ? '✓' : '✗'}</div>
+                    <div class="truncate">${given}</div>
+                    ${ok ? '' : `<div class="truncate text-[10px] opacity-80">key: ${escapeHtml(r.k || '')}</div>`}
+                </div>`;
+            }
+            return secLine + `<div class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-8 lg:grid-cols-10 gap-1.5">${cells}</div>
+                <div class="text-[10px] text-slate-400 mt-2">Green = correct, red = incorrect (shows the student's answer and the key).</div>`;
+        }
+
+        window.renderAnalysis = function() {
+            const allSubmitted = Array.from(rawStudentsMap.values()).filter(s => s.isSubmitted);
+            const submitted = allSubmitted.filter(s => s.results);
+            const body = document.getElementById('analysisBody');
+            const sub = document.getElementById('analysisSubtitle');
+            if (submitted.length === 0) {
+                sub.innerText = allSubmitted.length
+                    ? `${allSubmitted.length} student(s) submitted, but none sent per-question results. They probably used the old student page, or the save was blocked (check Firebase rules / student console).`
+                    : 'No submissions with tracked results yet.';
+                document.getElementById('analysisSummary').innerHTML = '';
+                body.innerHTML = '<tr><td colspan="6" class="py-6 text-center text-slate-500">Question statistics will appear once students submit.</td></tr>';
+                return;
+            }
+            sub.innerText = `Based on ${submitted.length} submitted student${submitted.length === 1 ? '' : 's'}` + (allSubmitted.length > submitted.length ? ` (${allSubmitted.length - submitted.length} more submitted without tracked results).` : '.');
+            const rows = [];
+            for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+                let correct = 0, total = 0, key = '';
+                const wrong = {};
+                submitted.forEach(s => {
+                    const r = s.results['q' + i];
+                    if (!r) return;
+                    total++;
+                    if (r.k) key = r.k;
+                    if (r.c === 1) correct++;
+                    else {
+                        const a = (r.a || '').trim() || '(blank)';
+                        wrong[a] = (wrong[a] || 0) + 1;
+                    }
+                });
+                if (!total) continue;
+                const top = Object.entries(wrong).sort((a, b) => b[1] - a[1])[0];
+                rows.push({ i, correct, total, key, pct: Math.round(correct / total * 100), top });
+            }
+            // ---- class summary cards ----
+            const hardest = rows.filter(r => r.pct < 100).slice().sort((a, b) => a.pct - b.pct || a.i - b.i).slice(0, 5);
+            const allRight = rows.filter(r => r.pct === 100).map(r => r.i);
+            const noneRight = rows.filter(r => r.correct === 0).map(r => r.i);
+            const avgScoreList = submitted.filter(s => s.totalScore !== null).map(s => s.totalScore);
+            const avgScore = avgScoreList.length ? (avgScoreList.reduce((a, b) => a + b, 0) / avgScoreList.length).toFixed(1) : '—';
+            const qChip = (n, cls) => `<span class="inline-flex items-center justify-center min-w-[1.75rem] h-6 px-1.5 rounded text-[11px] font-bold ${cls}">Q${n}</span>`;
+            const hardHtml = hardest.length
+                ? hardest.map(r => `<div class="flex items-center justify-between gap-2 py-1.5 border-b border-slate-100 last:border-0">
+                        <div class="flex items-center gap-2">${qChip(r.i, 'bg-rose-500 text-white')}<span class="text-[11px] text-slate-500">key: <span class="font-mono font-semibold text-slate-700">${escapeHtml(r.key)}</span>${r.top ? ` • common wrong: <span class="font-mono">${escapeHtml(r.top[0])}</span> (${r.top[1]})` : ''}</span></div>
+                        <span class="text-xs font-bold text-rose-600 whitespace-nowrap">${r.pct}% correct</span></div>`).join('')
+                : '<div class="text-xs text-slate-500">Everyone answered every question correctly.</div>';
+            document.getElementById('analysisSummary').innerHTML = `
+                <div class="lg:col-span-2 bg-white border border-rose-200 rounded-xl p-3.5">
+                    <div class="text-xs font-bold text-rose-700 uppercase tracking-wider mb-1.5">Most missed questions — review these in class</div>
+                    ${hardHtml}
+                    ${noneRight.length ? `<div class="mt-2 text-[11px] text-rose-700 font-semibold">Nobody got these right: ${noneRight.map(n => 'Q' + n).join(', ')}</div>` : ''}
+                </div>
+                <div class="space-y-3">
+                    <div class="bg-white border border-emerald-200 rounded-xl p-3.5">
+                        <div class="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-1.5">Everyone got right (${allRight.length})</div>
+                        <div class="flex flex-wrap gap-1">${allRight.length ? allRight.map(n => qChip(n, 'bg-emerald-100 text-emerald-700')).join('') : '<span class="text-xs text-slate-500">No question was answered correctly by everyone.</span>'}</div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-xl p-3.5 text-xs">
+                        <span class="font-bold text-slate-700">Class average score:</span> <span class="font-mono font-bold text-slate-900">${avgScore} / 100</span>
+                    </div>
+                </div>`;
+
+            if (document.getElementById('analysisSort').value === 'hardest') {
+                rows.sort((a, b) => a.pct - b.pct || a.i - b.i);
+            }
+            body.innerHTML = rows.map(r => {
+                const color = r.pct >= 70 ? 'bg-emerald-500' : (r.pct >= 40 ? 'bg-amber-500' : 'bg-rose-500');
+                const sec = getSectionMetadata(r.i);
+                return `<tr class="hover:bg-slate-50/80">
+                    <td class="py-2.5 px-4 font-mono font-bold text-slate-900">Q${r.i}</td>
+                    <td class="py-2.5 px-4"><span class="text-[11px] font-medium px-2 py-0.5 rounded border ${sec.badgeClass}">${sectionKeyOf(r.i)}</span></td>
+                    <td class="py-2.5 px-4 font-mono">${escapeHtml(r.key)}</td>
+                    <td class="py-2.5 px-4"><div class="flex items-center gap-2"><div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden"><div class="h-full ${color}" style="width:${r.pct}%"></div></div><span class="font-semibold w-10 text-right">${r.pct}%</span></div></td>
+                    <td class="py-2.5 px-4 font-mono">${r.correct} / ${r.total}</td>
+                    <td class="py-2.5 px-4 text-slate-600">${r.top ? `${escapeHtml(r.top[0])} <span class="text-slate-400">(${r.top[1]})</span>` : '—'}</td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.exportResultsCsv = function() {
+            const list = Array.from(rawStudentsMap.values()).filter(s => s.isSubmitted && s.results);
+            if (!list.length) { alert('No submitted results to export yet.'); return; }
+            const esc = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+            const head = ['Student', 'Total'];
+            for (let i = 1; i <= TOTAL_QUESTIONS; i++) head.push('Q' + i);
+            const lines = [head.map(esc).join(',')];
+            list.sort((a, b) => a.studentName.localeCompare(b.studentName)).forEach(s => {
+                const row = [s.studentName, s.totalScore ?? ''];
+                for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+                    const r = s.results['q' + i];
+                    row.push(r ? (r.c === 1 ? 'correct' : 'wrong: ' + (r.a || 'blank')) : '');
+                }
+                lines.push(row.map(esc).join(','));
+            });
+            const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `results_${currentSessionCode}.csv`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        };
+
+        window.renderStudentList = function() {
+            window.renderAnalysis();
+            const allStudents = Array.from(rawStudentsMap.values()).map((s) => ({
+                ...s,
+                effectiveStatus: deriveEffectiveStatus(s)
+            }));
+
+            // Compute KPI counts
+            const totalCount = allStudents.length;
+            const onlineCount = allStudents.filter(s => s.effectiveStatus === 'online').length;
+            const awayCount = allStudents.filter(s => s.effectiveStatus === 'away').length;
+            const submittedCount = allStudents.filter(s => s.isSubmitted).length;
+            const inProgressCount = allStudents.filter(s => !s.isSubmitted).length;
+
+            const totalAnsweredSum = allStudents.reduce((acc, s) => acc + s.answeredCount, 0);
+            const avgAnswered = totalCount > 0 ? (totalAnsweredSum / totalCount) : 0;
+            const avgPct = totalCount > 0 ? Math.round((avgAnswered / TOTAL_QUESTIONS) * 100) : 0;
+
+            document.getElementById('kpiTotal').innerText = totalCount;
+            document.getElementById('kpiOnline').innerText = onlineCount;
+            document.getElementById('kpiAway').innerText = awayCount;
+            document.getElementById('kpiSubmitted').innerText = submittedCount;
+            document.getElementById('kpiAvgAnswered').innerHTML = `${avgAnswered.toFixed(1)} <span class="text-sm font-semibold text-slate-400">/ ${TOTAL_QUESTIONS}</span>`;
+            document.getElementById('kpiAvgPct').innerText = `${avgPct}%`;
+
+            document.getElementById('count-all').innerText = totalCount;
+            document.getElementById('count-online').innerText = onlineCount;
+            document.getElementById('count-away').innerText = awayCount;
+            document.getElementById('count-in_progress').innerText = inProgressCount;
+            document.getElementById('count-submitted').innerText = submittedCount;
+
+            // Filter by status tab & search term
+            const searchTerm = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+            let filtered = allStudents.filter((s) => {
+                if (activeFilter === 'online' && s.effectiveStatus !== 'online') return false;
+                if (activeFilter === 'away' && s.effectiveStatus !== 'away') return false;
+                if (activeFilter === 'submitted' && !s.isSubmitted) return false;
+                if (activeFilter === 'in_progress' && s.isSubmitted) return false;
+                if (searchTerm && !s.studentName.toLowerCase().includes(searchTerm)) return false;
+                return true;
+            });
+
+            // Sort in JS memory
+            const sortBy = document.getElementById('sortSelect').value;
+            const statusPriority = { online: 1, away: 2, submitted: 3 };
+            filtered.sort((a, b) => {
+                if (sortBy === 'name_asc') return a.studentName.localeCompare(b.studentName);
+                if (sortBy === 'progress_desc') return b.answeredCount - a.answeredCount || a.studentName.localeCompare(b.studentName);
+                if (sortBy === 'progress_asc') return a.answeredCount - b.answeredCount || a.studentName.localeCompare(b.studentName);
+                if (sortBy === 'question_desc') return b.currentQuestion - a.currentQuestion || a.studentName.localeCompare(b.studentName);
+                // Default: status priority then name
+                return (statusPriority[a.effectiveStatus] - statusPriority[b.effectiveStatus]) || a.studentName.localeCompare(b.studentName);
+            });
+
+            document.getElementById('visibleCountLabel').innerText = `Showing ${filtered.length} of ${totalCount} student${totalCount === 1 ? '' : 's'}`;
+
+            const emptyState = document.getElementById('emptyState');
+            const desktopWrapper = document.getElementById('desktopTableWrapper');
+            const mobileWrapper = document.getElementById('mobileCardsWrapper');
+            const tbody = document.getElementById('studentTableBody');
+
+            if (totalCount === 0) {
+                emptyState.classList.remove('hidden');
+                desktopWrapper.classList.add('hidden');
+                mobileWrapper.innerHTML = '';
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            desktopWrapper.classList.remove('hidden');
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs text-slate-500">No students match the current filter or search query.</td></tr>`;
+                mobileWrapper.innerHTML = `<div class="p-6 text-center text-xs text-slate-500">No students match the current filter or search query.</div>`;
+                return;
+            }
+
+            let rowsHtml = '';
+            let cardsHtml = '';
+
+            filtered.forEach((s) => {
+                const safeName = escapeHtml(s.studentName);
+                const pct = Math.round((s.answeredCount / TOTAL_QUESTIONS) * 100);
+                const section = getSectionMetadata(s.currentQuestion);
+                const relTime = formatRelativeTime(s.lastSeenMs);
+
+                let statusBadgeHtml = '';
+                if (s.effectiveStatus === 'online') {
+                    statusBadgeHtml = `
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Online
+                        </span>`;
+                } else if (s.effectiveStatus === 'away') {
+                    statusBadgeHtml = `
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                            Away
+                        </span>`;
+                } else {
+                    statusBadgeHtml = `
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 exam-navy-text border border-blue-200">
+                            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                            Submitted
+                        </span>`;
+                }
+
+                const submissionBadgeHtml = s.isSubmitted
+                    ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-xs">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        Submitted
+                       </span>`
+                    : `<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                        In Progress
+                       </span>`;
+
+                const barColor = s.isSubmitted ? 'bg-emerald-600' : 'exam-navy';
+
+                const isOpen = expandedIds.has(s.id);
+                const sid = escapeHtml(s.id).replace(/'/g, '');
+                const caret = s.isSubmitted ? `<span class="text-slate-400 text-xs">${isOpen ? '▼' : '▶'}</span>` : '';
+                rowsHtml += `
+                    <tr class="hover:bg-slate-50/80 transition ${s.isSubmitted ? 'cursor-pointer' : ''}" ${s.isSubmitted ? `onclick="toggleDetail('${sid}')"` : ''}>
+                        <td class="py-3.5 px-5 font-semibold text-slate-900">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-xs font-bold exam-navy-text uppercase">
+                                    ${escapeHtml(s.studentName.slice(0, 2))}
+                                </div>
+                                <span>${safeName}</span>
+                                ${caret}
+                            </div>
+                            ${miniStripHtml(s)}
+                        </td>
+                        <td class="py-3.5 px-4">${statusBadgeHtml}</td>
+                        <td class="py-3.5 px-4">
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono font-bold text-slate-900 text-xs bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                    Q${s.currentQuestion} / ${TOTAL_QUESTIONS}
+                                </span>
+                                <span class="text-[11px] font-medium px-2 py-0.5 rounded border ${section.badgeClass}">
+                                    ${section.label}
+                                </span>
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-4">
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs font-semibold">
+                                    <span class="text-slate-700">${s.answeredCount} / ${TOTAL_QUESTIONS}</span>
+                                    <span class="text-slate-500">${pct}%</span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/60">
+                                    <div class="h-full ${barColor} transition-all duration-300" style="width: ${pct}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-4">${submissionBadgeHtml}</td>
+                        <td class="py-3.5 px-4">${scoreCellHtml(s)}</td>
+                        <td class="py-3.5 px-5 text-right font-mono text-xs text-slate-500">${relTime}</td>
+                    </tr>
+                    ${isOpen ? `<tr class="bg-slate-50"><td colspan="7" class="px-5 py-4">${detailHtml(s)}</td></tr>` : ''}
+                `;
+
+                cardsHtml += `
+                    <div class="p-4 space-y-3 ${s.isSubmitted ? 'cursor-pointer' : ''}" ${s.isSubmitted ? `onclick="toggleDetail('${sid}')"` : ''}>
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="font-bold text-sm text-slate-900">${safeName}</div>
+                            ${statusBadgeHtml}
+                        </div>
+                        ${miniStripHtml(s)}
+                        <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+                            <span class="font-mono font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                                Current: Q${s.currentQuestion} / ${TOTAL_QUESTIONS}
+                            </span>
+                            <span class="text-[11px] font-medium px-2 py-0.5 rounded border ${section.badgeClass}">
+                                ${section.label}
+                            </span>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs font-semibold">
+                                <span class="text-slate-600">Answered: ${s.answeredCount} / ${TOTAL_QUESTIONS}</span>
+                                <span class="text-slate-500">${pct}%</span>
+                            </div>
+                            <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full ${barColor}" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between pt-1">
+                            ${submissionBadgeHtml}
+                            <span class="font-mono text-[11px] text-slate-400">Active: ${relTime}</span>
+                        </div>
+                        ${s.isSubmitted ? `<div class="flex items-center justify-between text-xs"><span>Score: ${scoreCellHtml(s)}</span><span class="text-slate-400">${isOpen ? '▼ hide' : '▶ details'}</span></div>` : ''}
+                        ${isOpen ? `<div class="pt-2 border-t border-slate-100">${detailHtml(s)}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            tbody.innerHTML = rowsHtml;
+            mobileWrapper.innerHTML = cardsHtml;
+        };
+
+        async function initTeacherMonitor() {
+            if (!firebaseConfig) {
+                updateConnectionBadge(false, 'Firebase config missing');
+                return;
+            }
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                if (typeof window.__initial_auth_token !== 'undefined' && window.__initial_auth_token) {
+                    const cred = await signInWithCustomToken(auth, window.__initial_auth_token);
+                    currentUser = cred.user;
+                } else {
+                    const cred = await signInAnonymously(auth);
+                    currentUser = cred.user;
+                }
+
+                subscribeToSession(currentSessionCode);
+
+                // Periodic 3-second polling + UI refresh to guarantee live sync even if listener stalls
+                setInterval(() => {
+                    fetchSessionNow();
+                    const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    const lbl = document.getElementById('lastRefreshLabel');
+                    if (lbl) lbl.innerText = `Live • Refreshed ${nowStr}`;
+                }, 3000);
+            } catch (err) {
+                console.error('Teacher monitor init error:', err);
+                updateConnectionBadge(false, `Auth error: ${err.message || 'Failed'}`);
+            }
+        }
+
+        window.addEventListener('load', initTeacherMonitor);
+    </script>
+</body>
+</html>
